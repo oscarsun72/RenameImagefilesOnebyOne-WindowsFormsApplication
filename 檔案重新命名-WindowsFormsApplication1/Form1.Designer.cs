@@ -63,7 +63,7 @@
             this.label1.Location = new System.Drawing.Point(145, 15);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(136, 16);
+            this.label1.Size = new System.Drawing.Size(135, 16);
             this.label1.TabIndex = 1;
             this.label1.Text = "方便重新命名檔案";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -95,6 +95,7 @@
             this.textBox2.TabIndex = 3;
             this.textBox2.Text = "重新命名預覽";
             this.textBox2.Click += new System.EventHandler(this.textBox2_Click);
+            this.textBox2.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
             this.textBox2.DragDrop += new System.Windows.Forms.DragEventHandler(this.textBox2_DragDrop);
             this.textBox2.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
             // 
@@ -106,7 +107,7 @@
             this.checkBox1.Location = new System.Drawing.Point(285, 815);
             this.checkBox1.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(107, 20);
+            this.checkBox1.Size = new System.Drawing.Size(106, 20);
             this.checkBox1.TabIndex = 4;
             this.checkBox1.Text = "最上層顯示";
             this.checkBox1.UseVisualStyleBackColor = true;
@@ -128,8 +129,11 @@
             this.pictureBox1.Location = new System.Drawing.Point(12, 51);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(731, 491);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 6;
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
+            this.pictureBox1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseClick);
             // 
             // comboBox1
             // 
@@ -141,6 +145,8 @@
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(144, 27);
             this.comboBox1.TabIndex = 7;
+            this.comboBox1.Text = "本家";
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             this.comboBox1.SelectedValueChanged += new System.EventHandler(this.comboBox1_SelectedValueChanged);
             this.comboBox1.Click += new System.EventHandler(this.comboBox1_Click_1);
             this.comboBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.comboBox1_MouseDown);
@@ -153,6 +159,7 @@
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(144, 27);
             this.comboBox2.TabIndex = 8;
+            this.comboBox2.Text = "家人";
             this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
             // 
             // comboBox3
@@ -163,6 +170,7 @@
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(144, 27);
             this.comboBox3.TabIndex = 9;
+            this.comboBox3.Text = "師";
             // 
             // comboBox4
             // 
@@ -172,6 +180,7 @@
             this.comboBox4.Name = "comboBox4";
             this.comboBox4.Size = new System.Drawing.Size(144, 27);
             this.comboBox4.TabIndex = 10;
+            this.comboBox4.Text = "友";
             // 
             // comboBox5
             // 
@@ -181,15 +190,17 @@
             this.comboBox5.Name = "comboBox5";
             this.comboBox5.Size = new System.Drawing.Size(144, 27);
             this.comboBox5.TabIndex = 11;
+            this.comboBox5.Text = "生";
             // 
             // comboBox6
             // 
             this.comboBox6.Font = new System.Drawing.Font("新細明體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.comboBox6.FormattingEnabled = true;
-            this.comboBox6.Location = new System.Drawing.Point(172, 616);
+            this.comboBox6.Location = new System.Drawing.Point(481, 616);
             this.comboBox6.Name = "comboBox6";
             this.comboBox6.Size = new System.Drawing.Size(144, 27);
             this.comboBox6.TabIndex = 12;
+            this.comboBox6.Text = "其他（會議等）";
             // 
             // Form1
             // 
