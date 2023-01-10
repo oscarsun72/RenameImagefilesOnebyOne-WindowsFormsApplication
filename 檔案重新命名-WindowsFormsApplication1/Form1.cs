@@ -20,7 +20,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
 {
     public partial class Form1 : wfrm.Form
     {
-
+        Process prcssDownloadImgFullName;
         //副檔名清單
         readonly string[] imgExt = { ".jpg", ".png", ".bmp", ".gif", ".tif", ".tiff", ".jpeg" };
         List<string> imagesList = new List<string>();
@@ -41,6 +41,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
             family.Add("eight");
             family.PrintContents();
             comboBox1.DataSource = family;
+            pictureBox1.MouseWheel += new MouseEventHandler(pictureBox1_MouseWheel);
 
         }
 
@@ -83,7 +84,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         private void textBox1_Click(object sender, EventArgs e)
         {
-            //textBox1.Text = "";
+            //textBox1.Text = "";            
             textBox1.Text = Clipboard.GetText();
         }
         private void textBox2_Click(object sender, EventArgs e)
@@ -497,6 +498,21 @@ namespace 檔案重新命名_WindowsFormsApplication1
             }
         }
 
+        //202301110038 creedit chatGPT：C# Windows Form MouseWheelEvent：感恩感恩　讚歎讚歎　南無阿彌陀佛
+        private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                // 滾輪向上
+                previousImageShow();
+            }
+            else
+            {
+                // 滾輪向下
+                nextImageShow();
+            }
+        }
+
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
             switch (e.Button)
@@ -604,15 +620,19 @@ namespace 檔案重新命名_WindowsFormsApplication1
             if (imagesList.Count == 0)
             {
                 MessageBox.Show("此資料夾內沒有圖檔！");
+                return false;
+            }
+            else
+            {
+                //顯示目前正在處理的資料夾路徑
+                this.Text = sourcePath;
+                //顯示正在顯示處理之檔名（不含路徑）
+                label1Text_FileName();
+                if (imageIndex != 0) imageIndex = 0;
                 return true;
             }
-            //顯示目前正在處理的資料夾路徑
-            this.Text = sourcePath;
-            //顯示正在顯示處理之檔名（不含路徑）
-            label1Text_FileName();
-            return true;
         }
-
+        string newFullName;
         int currentImageIndex;
         void movefileDestination(string sourceFullName, string dirDestination)
         {
@@ -624,8 +644,8 @@ namespace 檔案重新命名_WindowsFormsApplication1
             if (File.Exists(sourceFullName) && Directory.Exists(dirDestination))
             {
                 string fileName = Path.GetFileName(sourceFullName);//sourceFullName.Substring(sourceFullName.LastIndexOf("\\") + 1);
-                string newFullName = dirDestination.Substring(dirDestination.Length-1,1)=="\\"
-                    ? dirDestination +  fileName:dirDestination + "\\" + fileName;
+                dirDestination = dirDestination.Substring(dirDestination.Length - 1, 1) == "\\" ? dirDestination : dirDestination + "\\";
+                newFullName = dirDestination + fileName;
                 //如果目的地已有同檔名者：
                 int i = 0;
                 //避免檔名衝突
@@ -723,7 +743,8 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         private void textBox4_Click(object sender, EventArgs e)
         {
-            textBox_Ciick_importPath_Movefile(ref textBox4);
+            if (ModifierKeys == Keys.None)
+                textBox_Ciick_importPath_Movefile(ref textBox4);
         }
 
         private void textBox_Ciick_importPath_Movefile(ref wfrm.TextBox textBox)
@@ -732,7 +753,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
             string x = Clipboard.GetText();
             if ((textBox.Text == "" && Directory.Exists(x)) || (Directory.Exists(x) && x != textBox.Text))
             {
-                textBox.Text = x;Clipboard.Clear();
+                textBox.Text = x; Clipboard.Clear();
             }
             //Movefile
             else
@@ -763,13 +784,49 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         private void textBox3_Click(object sender, EventArgs e)
         {
-            textBox_Ciick_importPath_Movefile(ref textBox3);
-
+            if (ModifierKeys == Keys.None)
+                textBox_Ciick_importPath_Movefile(ref textBox3);
         }
 
         private void textBox4_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void textBox4_MouseDown(object sender, MouseEventArgs e)
+        {
+            //開啟資料夾以檢視
+            if (e.Button == MouseButtons.Left)
+                if (ModifierKeys == Keys.Control)
+                    selectFileInExplorer(textBox4.Text, newFullName);
+        }
+
+        void selectFileInExplorer(string dir, string fullname="")
+        {
+            if (File.Exists(fullname)) 
+            //檔案總管中將已其選取
+            //https://www.ruyut.com/2022/05/csharp-open-in-file-explorer.html
+            ////把之前開過的關閉
+            //if (prcssDownloadImgFullName != null && prcssDownloadImgFullName.HasExited)
+            //{
+            //    prcssDownloadImgFullName.WaitForExit();
+            //    prcssDownloadImgFullName.Close();
+            //    ////prcssDownloadImgFullName.WaitForExit();
+            //    //prcssDownloadImgFullName.Kill();
+            //}
+            prcssDownloadImgFullName = System.Diagnostics.Process.Start("Explorer.exe", $"/e, /select ,{fullname}");
+            else//沒有指定檔案則開啟資料夾
+            {
+                if (Directory.Exists(dir))
+                    Process.Start("Explorer.exe",dir);
+            }
+        }
+
+        private void textBox3_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+                if (ModifierKeys == Keys.Control)
+                    selectFileInExplorer(textBox3.Text, newFullName);
         }
     }
 }

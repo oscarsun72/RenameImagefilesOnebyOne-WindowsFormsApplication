@@ -207,6 +207,7 @@
             this.textBox3.TabIndex = 13;
             this.textBox3.Text = "要移動到的資料夾路徑";
             this.textBox3.Click += new System.EventHandler(this.textBox3_Click);
+            this.textBox3.MouseDown += new System.Windows.Forms.MouseEventHandler(this.textBox3_MouseDown);
             // 
             // textBox4
             // 
@@ -219,6 +220,7 @@
             this.textBox4.TabIndex = 14;
             this.textBox4.Text = "要移動到的資料夾路徑";
             this.textBox4.Click += new System.EventHandler(this.textBox4_Click);
+            this.textBox4.MouseDown += new System.Windows.Forms.MouseEventHandler(this.textBox4_MouseDown);
             // 
             // button4
             // 
