@@ -15,6 +15,7 @@ using wfrm = System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using io = System.IO;
 using static System.Net.Mime.MediaTypeNames;
+using System.Data.OleDb;
 
 namespace 檔案重新命名_WindowsFormsApplication1
 {
@@ -23,27 +24,90 @@ namespace 檔案重新命名_WindowsFormsApplication1
         Process prcssDownloadImgFullName;
         //副檔名清單
         readonly string[] imgExt = { ".jpg", ".png", ".bmp", ".gif", ".tif", ".tiff", ".jpeg" };
-        List<string> imagesList = new List<string>();
         string sourcePath = "";
+        List<string> imagesList = new List<string>();
+        static int xlsRecordCount = 0;
         public Form1()
         {
             InitializeComponent();
-            SimpleList family = new SimpleList();
+            //202301110121 creedit chatGPT：Read Excel into C# code：
+            string filePath = "H:\\共用雲端硬碟\\黃老師遠端工作\\沛榮相片整理重新命名用資料表.xlsx";
+            if (!File.Exists(filePath))
+                filePath = "G:\\共用雲端硬碟\\黃老師遠端工作\\沛榮相片整理重新命名用資料表.xlsx";
+            if (!File.Exists(filePath))
+                filePath = "K:\\共用雲端硬碟\\黃老師遠端工作\\沛榮相片整理重新命名用資料表.xlsx";
 
-            // Populate the List            
-            family.Add("沛榮");
-            family.Add("玫儀");
-            family.Add("靖F");
-            family.Add("JT");
-            family.Add("five");
-            family.Add("six");
-            family.Add("seven");
-            family.Add("eight");
-            family.PrintContents();
-            comboBox1.DataSource = family;
+            string connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + filePath + ";" +
+                                        "Extended Properties='Excel 12.0;HDR=YES;IMEX=1'";
+
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT COUNT(*) FROM [工作表1$]";
+
+                using (OleDbCommand command = new OleDbCommand(query, connection))
+                {
+                    xlsRecordCount = (int)command.ExecuteScalar();
+                }
+
+                query = "SELECT 本家, 家人, 師友生_臺大, 師友生_臺灣學術界, 師友生_其他學術界, 會議, 其他 FROM [工作表1$]";
+                using (OleDbCommand command = new OleDbCommand(query, connection))
+                {
+                    using (OleDbDataReader reader = command.ExecuteReader())
+                    {
+                        SimpleList family = new SimpleList(), families = new SimpleList(), ntu = new SimpleList()
+                        , tw = new SimpleList(), cademia = new SimpleList(), conference = new SimpleList()
+                        , others = new SimpleList();
+                        while (reader.Read())
+                        {
+                            if (reader[0].ToString() != "")
+                                family.Add(reader[0].ToString());
+                            if (reader[1].ToString() != "")
+                                families.Add(reader[1].ToString());
+                            if (reader[2].ToString() != "")
+                                ntu.Add(reader[2].ToString());
+                            if (reader[3].ToString() != "")
+                                tw.Add(reader[3].ToString());
+                            if (reader[4].ToString() != "")
+                                cademia.Add(reader[4].ToString());
+                            if (reader[5].ToString() != "")
+                                conference.Add(reader[5].ToString());
+                            if (reader[6].ToString() != "")
+                                others.Add(reader[6].ToString());
+                        }
+                        comboBox1.DataSource = family;
+                        comboBox2.DataSource = families;
+                        comboBox3.DataSource = ntu;
+                        comboBox4.DataSource = tw;
+                        comboBox5.DataSource = cademia;
+                        comboBox6.DataSource = conference;
+                        comboBox7.DataSource = others;
+                        comboBox1.MaxDropDownItems = family.Count < 101 ? family.Count : 100;
+                        comboBox2.MaxDropDownItems = families.Count < 101 ? families.Count : 100;
+                        comboBox3.MaxDropDownItems = ntu.Count < 101 ? ntu.Count : 100;
+                        comboBox4.MaxDropDownItems = tw.Count < 101 ? tw.Count : 100;
+                        comboBox5.MaxDropDownItems = cademia.Count < 101 ? cademia.Count : 100;
+                        comboBox6.MaxDropDownItems = conference.Count < 101 ? conference.Count : 100;
+                        comboBox7.MaxDropDownItems = others.Count < 101 ? others.Count : 100;
+                    }
+                }
+            }
+            //// Populate the List            
+            //family.Add("沛榮");
+            //family.Add("玫儀");
+            //family.Add("靖F");
+            //family.Add("JT");
+            //family.Add("five");
+            //family.Add("six");
+            //family.Add("seven");
+            //family.Add("eight");
+            //family.PrintContents();
+
+
             pictureBox1.MouseWheel += new MouseEventHandler(pictureBox1_MouseWheel);
 
         }
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -87,10 +151,12 @@ namespace 檔案重新命名_WindowsFormsApplication1
             //textBox1.Text = "";            
             textBox1.Text = Clipboard.GetText();
         }
+
+        //重新命名預覽
         private void textBox2_Click(object sender, EventArgs e)
         {
-            textBox2.Text = "";
-            textBox2.Text = Clipboard.GetText();
+            if (textBox2.Text == "")
+                textBox2.Text = Clipboard.GetText();
         }
 
 
@@ -205,9 +271,11 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         }
 
+
+
         class SimpleList : IList //https://docs.microsoft.com/zh-tw/dotnet/api/system.collections.ilist?view=netframework-4.8
         {
-            private object[] _contents = new object[8];
+            private object[] _contents = new object[xlsRecordCount];//new object[8];
             private int _count;
 
             public SimpleList()
@@ -486,6 +554,8 @@ namespace 檔案重新命名_WindowsFormsApplication1
             }
         }
 
+
+        //重新命名預覽
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
         }
@@ -801,24 +871,24 @@ namespace 檔案重新命名_WindowsFormsApplication1
                     selectFileInExplorer(textBox4.Text, newFullName);
         }
 
-        void selectFileInExplorer(string dir, string fullname="")
+        void selectFileInExplorer(string dir, string fullname = "")
         {
-            if (File.Exists(fullname)) 
-            //檔案總管中將已其選取
-            //https://www.ruyut.com/2022/05/csharp-open-in-file-explorer.html
-            ////把之前開過的關閉
-            //if (prcssDownloadImgFullName != null && prcssDownloadImgFullName.HasExited)
-            //{
-            //    prcssDownloadImgFullName.WaitForExit();
-            //    prcssDownloadImgFullName.Close();
-            //    ////prcssDownloadImgFullName.WaitForExit();
-            //    //prcssDownloadImgFullName.Kill();
-            //}
-            prcssDownloadImgFullName = System.Diagnostics.Process.Start("Explorer.exe", $"/e, /select ,{fullname}");
+            if (File.Exists(fullname))
+                //檔案總管中將已其選取
+                //https://www.ruyut.com/2022/05/csharp-open-in-file-explorer.html
+                ////把之前開過的關閉
+                //if (prcssDownloadImgFullName != null && prcssDownloadImgFullName.HasExited)
+                //{
+                //    prcssDownloadImgFullName.WaitForExit();
+                //    prcssDownloadImgFullName.Close();
+                //    ////prcssDownloadImgFullName.WaitForExit();
+                //    //prcssDownloadImgFullName.Kill();
+                //}
+                prcssDownloadImgFullName = System.Diagnostics.Process.Start("Explorer.exe", $"/e, /select ,{fullname}");
             else//沒有指定檔案則開啟資料夾
             {
                 if (Directory.Exists(dir))
-                    Process.Start("Explorer.exe",dir);
+                    Process.Start("Explorer.exe", dir);
             }
         }
 
@@ -827,6 +897,31 @@ namespace 檔案重新命名_WindowsFormsApplication1
             if (e.Button == MouseButtons.Left)
                 if (ModifierKeys == Keys.Control)
                     selectFileInExplorer(textBox3.Text, newFullName);
+        }
+
+        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox7_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox6_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
