@@ -21,7 +21,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
 {
     public partial class Form1 : wfrm.Form
     {
-        Process prcssDownloadImgFullName;
+        Process prcssImgFullName;
         //副檔名清單
         readonly string[] imgExt = { ".jpg", ".png", ".bmp", ".gif", ".tif", ".tiff", ".jpeg" };
         string sourcePath = "";
@@ -156,13 +156,24 @@ namespace 檔案重新命名_WindowsFormsApplication1
             }
             return newFullName;
         }
-
+        Process prcssNewImgFullName;
         private void button1_Click(object sender, EventArgs e)
         {
             if (ModifierKeys == Keys.None)
                 renameFilename();
             else//開啟檔案總管檢視，重新命名的檔案會被選取
-            { renameFilename(); System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{newFullName}\""); }
+            {
+                //把之前開過的關閉
+                if (prcssNewImgFullName != null && prcssNewImgFullName.HasExited)
+                {
+                    prcssNewImgFullName.WaitForExit();
+                    prcssNewImgFullName.Close();
+                    ////prcssDownloadImgFullName.WaitForExit();
+                    //prcssDownloadImgFullName.Kill();
+                }
+
+                prcssNewImgFullName = System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{renameFilename()}\"");
+            }
 
 
             ////test the pull request!
@@ -302,7 +313,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
             }
         }
 
-               
+
 
         //202301110321 creedit chatGPT：簡化comboBox事件處理：
         private void comboBox_Click_SelectedIndexChanged(object sender, EventArgs e)//(wfrm.ComboBox cmbx)
@@ -318,7 +329,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         private void comboBox_Click(object sender, EventArgs e)//(wfrm.ComboBox cmbx)
         {
-            ((wfrm.ComboBox)sender).DroppedDown = true;            
+            ((wfrm.ComboBox)sender).DroppedDown = true;
         }
 
         class SimpleList : IList //https://docs.microsoft.com/zh-tw/dotnet/api/system.collections.ilist?view=netframework-4.8
@@ -497,8 +508,8 @@ namespace 檔案重新命名_WindowsFormsApplication1
                 Console.WriteLine();
             }
         }
-               
-        
+
+
         private void comboBox1_Click_1(object sender, EventArgs e)
         {
             comboBox1.DroppedDown = true;
@@ -901,18 +912,19 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         void selectFileInExplorer(string dir, string fullname = "")
         {
-            if (File.Exists(fullname))
+            if (File.Exists(fullname)) { 
                 //檔案總管中將已其選取
                 //https://www.ruyut.com/2022/05/csharp-open-in-file-explorer.html
-                ////把之前開過的關閉
-                //if (prcssDownloadImgFullName != null && prcssDownloadImgFullName.HasExited)
-                //{
-                //    prcssDownloadImgFullName.WaitForExit();
-                //    prcssDownloadImgFullName.Close();
-                //    ////prcssDownloadImgFullName.WaitForExit();
-                //    //prcssDownloadImgFullName.Kill();
-                //}
-                prcssDownloadImgFullName = System.Diagnostics.Process.Start("Explorer.exe", $"/e, /select ,{fullname}");
+                //把之前開過的關閉
+                if (prcssImgFullName != null && prcssImgFullName.HasExited)
+                {
+                    prcssImgFullName.WaitForExit();
+                    prcssImgFullName.Close();
+                    ////prcssDownloadImgFullName.WaitForExit();
+                    //prcssDownloadImgFullName.Kill();
+                }
+                prcssImgFullName = System.Diagnostics.Process.Start("Explorer.exe", $"/e, /select ,{fullname}");
+            }
             else//沒有指定檔案則開啟資料夾
             {
                 if (Directory.Exists(dir))
@@ -927,12 +939,6 @@ namespace 檔案重新命名_WindowsFormsApplication1
                     selectFileInExplorer(textBox3.Text, newFullName);
         }
 
-                
-
-        private void comboBox7_Click(object sender, EventArgs e)
-        {
-            comboBox_Click(sender,e);
-        }
 
     }
 }
