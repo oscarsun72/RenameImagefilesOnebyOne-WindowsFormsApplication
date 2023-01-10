@@ -100,6 +100,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\x.ico" />
+    <None Include="Resources\x.png" />
+    <None Include="Resources\x1.png" />
+    <None Include="Resources\x2.png" />
     <Content Include="檔案汰重.ico" />
   </ItemGroup>
   <ItemGroup>

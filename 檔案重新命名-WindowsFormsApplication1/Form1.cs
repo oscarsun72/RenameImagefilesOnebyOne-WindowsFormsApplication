@@ -43,33 +43,34 @@ namespace 檔案重新命名_WindowsFormsApplication1
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            //test the pull request!
-            if (io.Directory.Exists(textBox1.Text) && io.Directory.Exists(textBox2.Text))
-            {
-                foreach (var itemF in io.Directory.GetFiles(textBox1.Text))
-                {
-                    io.FileInfo f = new io.FileInfo(itemF);
-                    foreach (var itemT in io.Directory.GetFiles(textBox2.Text))
-                    {
-                        io.FileInfo ft = new io.FileInfo(itemT);
-                        if (f.LastWriteTime == ft.LastWriteTime && f.Length == ft.Length && f.Name == ft.Name)
-                        {
 
-                            if (io.File.GetAttributes(itemF).ToString().IndexOf(io.FileAttributes.ReadOnly.ToString()) != -1)
-                            {
-                                io.File.SetAttributes(itemF, io.FileAttributes.Normal);
-                            }
-                            io.File.Delete(itemF);
-                            break;
-                        }
-                    }
-                }
-                MessageBox.Show("done!");
-            }
-            else
-            {
-                MessageBox.Show("路徑有誤！");
-            }
+            ////test the pull request!
+            //if (io.Directory.Exists(textBox1.Text) && io.Directory.Exists(textBox2.Text))
+            //{
+            //    foreach (var itemF in io.Directory.GetFiles(textBox1.Text))
+            //    {
+            //        io.FileInfo f = new io.FileInfo(itemF);
+            //        foreach (var itemT in io.Directory.GetFiles(textBox2.Text))
+            //        {
+            //            io.FileInfo ft = new io.FileInfo(itemT);
+            //            if (f.LastWriteTime == ft.LastWriteTime && f.Length == ft.Length && f.Name == ft.Name)
+            //            {
+
+            //                if (io.File.GetAttributes(itemF).ToString().IndexOf(io.FileAttributes.ReadOnly.ToString()) != -1)
+            //                {
+            //                    io.File.SetAttributes(itemF, io.FileAttributes.Normal);
+            //                }
+            //                io.File.Delete(itemF);
+            //                break;
+            //            }
+            //        }
+            //    }
+            //    MessageBox.Show("done!");
+            //}
+            //else
+            //{
+            //    MessageBox.Show("路徑有誤！");
+            //}
         }
 
 
@@ -401,6 +402,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
         {
             if (textBox1.Text == "")
             {
+                //清除圖檔清單
                 imagesList.Clear();
                 return;
             }
@@ -411,7 +413,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
             {
                 string[] filesList;
                 filesList = io.Directory.GetFiles(path);
-                
+
                 foreach (var item in filesList)
                 {
                     if ("jpg,png,bmp,gif,".IndexOf(item.Substring(item.Length - 3), 0, StringComparison.CurrentCultureIgnoreCase) > -1)
@@ -471,11 +473,8 @@ namespace 檔案重新命名_WindowsFormsApplication1
         private void pictureBox1_Click(object sender, EventArgs e)
         {
             if (ModifierKeys == Keys.Control)
-            {//以小畫家開啟
-
-                Process.Start(Environment.GetFolderPath(Environment.SpecialFolder.Windows) +
-                    "\\system32\\mspaint.exe",
-                    pictureBox1.ImageLocation);
+            {
+                openByMsPaint();
                 return;
             }
         }
@@ -547,21 +546,14 @@ namespace 檔案重新命名_WindowsFormsApplication1
         {
             if (pictureBox1.ImageLocation != "")
             {
-
                 switch (ModifierKeys)
                 {
-                    case Keys.NoName:
+                    case Keys.None:
                         //以Windows系統預設的程式 （「相片檢視器」）開啟圖檔
                         Process.Start(pictureBox1.ImageLocation);
                         break;
                     case Keys.Control:
-                        //以「Microsoft Office Picture Manager」開啟圖檔
-                        //Process.Start(@"C:\Program Files(x86)\Microsoft Office\Office12\OIS.exe",
-                        //    pictureBox1.ImageLocation);
-                        Process.Start(
-                        Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) +
-                        @"\Microsoft Office\Office12\OIS.exe",
-                    pictureBox1.ImageLocation);
+                        openByMicrosoftOfficePictureManager();
                         break;
 
                     default:
@@ -585,6 +577,58 @@ namespace 檔案重新命名_WindowsFormsApplication1
         private void textBox3_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            openByDllhost();
+        }
+        bool chkFileExist()
+        {
+            string xp = textBox1.Text;
+            return (xp != "" || File.Exists(xp));
+        }
+        //以相片檢視器開啟
+        void openByDllhost()
+        {
+            if (chkFileExist())
+                Process.Start(Environment.GetFolderPath(Environment.SpecialFolder.Windows) +
+                    "\\System32\\dllhost.exe", textBox1.Text) ;
+        }
+
+        //以「Microsoft Office Picture Manager」開啟圖檔
+        void openByMicrosoftOfficePictureManager()
+        {
+
+            if (chkFileExist())
+            {
+                //Process.Start(@"C:\Program Files(x86)\Microsoft Office\Office12\OIS.exe",
+                //    pictureBox1.ImageLocation);
+                Process.Start(
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) +
+                @"\Microsoft Office\Office12\OIS.exe",
+            pictureBox1.ImageLocation);
+            }
+        }
+        //以小畫家開啟
+        void openByMsPaint()
+        {
+            if (chkFileExist())
+            {
+                Process.Start(Environment.GetFolderPath(Environment.SpecialFolder.Windows) +
+                    "\\system32\\mspaint.exe",
+                    pictureBox1.ImageLocation);
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            openByMicrosoftOfficePictureManager();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            openByMsPaint();
         }
     }
 }
