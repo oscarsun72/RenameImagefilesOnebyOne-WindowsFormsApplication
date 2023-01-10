@@ -8,15 +8,20 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Windows.Forms;
+using wfrm = System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using io = System.IO;
 
 namespace 檔案重新命名_WindowsFormsApplication1
 {
-    public partial class Form1 : Form
+    public partial class Form1 : wfrm.Form
     {
 
+        //副檔名清單
+        readonly string[] imgExt = { ".jpg", ".png", ".bmp", ".gif", ".tif", ".tiff", ".jpeg" };
         List<string> imagesList = new List<string>();
         public Form1()
         {
@@ -132,7 +137,9 @@ namespace 檔案重新命名_WindowsFormsApplication1
         {
             if (e.KeyCode == Keys.Escape)
             {
-                this.Close();
+                if (MessageBox.Show("結束應用程式？", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly)
+                    == DialogResult.OK)
+                    this.Close();
             }
 
             //瀏覽圖檔
@@ -184,7 +191,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
         }
 
 
-        private void comboBox_Click(ComboBox cmbx)
+        private void comboBox_Click(wfrm.ComboBox cmbx)
         {
             string x = cmbx.SelectedValue.ToString();
             if (textBox2.Text == "重新命名預覽")
@@ -402,8 +409,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
         {
             if (textBox1.Text == "")
             {
-                //清除圖檔清單
-                imagesList.Clear();
+                clearImageList();
                 return;
             }
             //if (MessageBox.Show("是否開始資料夾內的檔案重新命名？", "重新命名", MessageBoxButtons.OKCancel) == DialogResult.Cancel) return;           
@@ -411,23 +417,37 @@ namespace 檔案重新命名_WindowsFormsApplication1
             //處理資料夾內檔案
             if (io.Directory.Exists(path))
             {
+
                 sourcePath = path;
                 string[] filesList;
                 filesList = io.Directory.GetFiles(path);
-
-                foreach (var item in filesList)
+                if (imagesList.Count() > 0) clearImageList();
+                foreach (var fileName in filesList)
                 {
-                    if ("jpg,png,bmp,gif,".IndexOf(item.Substring(item.Length - 3), 0, StringComparison.CurrentCultureIgnoreCase) > -1)
-                        imagesList.Add(item);
+                    //if ( "jpg,png,bmp,gif,tif".IndexOf(item.Substring(item.Length - 3), 0, 
+                    //    //不分大小寫
+                    //    StringComparison.CurrentCultureIgnoreCase) > -1)
+                    //202301100950 creedit chatGPT ：C# Find Array Element IgnoreCase：
+                    if (imgExt.Any(x => x.Equals(
+                        //chatGPT：C# 取得檔案副檔名：C# 中有一個名為 Path 類別，它提供了用來操作文件路徑和文件名的方法。您可以使用 Path.GetExtension 方法來取得文件的副檔名。
+                        Path.GetExtension(fileName), StringComparison.OrdinalIgnoreCase)))
+                        imagesList.Add(fileName);
+
                 }
                 if (imagesList.Count == 0)
                 {
                     MessageBox.Show("此資料夾內沒有圖檔！");
                     return;
                 }
+
                 //若有圖檔則載入第一張圖檔
                 imageIndex = 0;
                 pictureBox1.ImageLocation = imagesList[imageIndex];
+                textBox1.Text = pictureBox1.ImageLocation;
+                //顯示來源資料夾路徑                
+                Text = sourcePath;
+                //顯示正在顯示處理之檔名（不含路徑）
+                label1Text_FileName();
                 //foreach (string fstr in filesList) //io.Directory.GetFiles(path))
                 //{
                 //    if (fstr == "") continue;
@@ -463,6 +483,13 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
 
             }
+        }
+
+        //清除圖檔清單
+        private void clearImageList()
+        {
+            imagesList.Clear();
+            imageIndex = 0;
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -513,8 +540,10 @@ namespace 檔案重新命名_WindowsFormsApplication1
                 case MouseButtons.Middle:
                     break;
                 case MouseButtons.XButton1:
+                    previousImageShow();
                     break;
                 case MouseButtons.XButton2:
+                    nextImageShow();
                     break;
                 default:
                     break;
@@ -526,21 +555,23 @@ namespace 檔案重新命名_WindowsFormsApplication1
         {
             if (imagesList.Count() == 0) return;
             if (imageIndex < 0) { imageIndex = 0; return; }
-            //next image            
-            pictureBox1.ImageLocation = imagesList[--imageIndex];
+            //next image
+            while (imageIndex - 1 > -1 && !File.Exists(imagesList[--imageIndex])) { }
+            pictureBox1.ImageLocation = imagesList[imageIndex];
             //顯示圖檔全檔名
             textBox1.Text = pictureBox1.ImageLocation;
-            //throw new NotImplementedException();
+            if (imageIndex == 0) MessageBox.Show("這是第一張！");
         }
         private void nextImageShow()
         {
             if (imagesList.Count() == 0) return;
             if (imageIndex > imagesList.Count - 1) { imageIndex = imagesList.Count(); return; }
+            while (imageIndex + 1 < imagesList.Count() && !File.Exists(imagesList[++imageIndex])) { }
             //next image
-            pictureBox1.ImageLocation = imagesList[++imageIndex];
+            pictureBox1.ImageLocation = imagesList[imageIndex];
             //顯示圖檔全檔名
             textBox1.Text = pictureBox1.ImageLocation;
-            //throw new NotImplementedException();
+            if (imageIndex == imagesList.Count() - 1) MessageBox.Show("這是最後一張！");
         }
 
         private void pictureBox1_DoubleClick(object sender, EventArgs e)
@@ -567,12 +598,28 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
 
 
-        void movefileDest(string fullName, string dirDestination)
+        void movefileDestination(string sourceFullName, string dirDestination)
         {
-            string fileName = fullName.Substring(fullName.LastIndexOf("\\") + 1);
-            string newFullName = dirDestination + "\\" + fileName;
-            //if(File.Exists())
-            //File.Move();
+            if (File.Exists(sourceFullName) && Directory.Exists(dirDestination))
+            {
+                string fileName = sourceFullName.Substring(sourceFullName.LastIndexOf("\\") + 1);
+                string newFullName = dirDestination + "\\" + fileName;
+                //如果目的地已有同檔名者：
+                int i = 0;
+                while (File.Exists(newFullName))
+                {
+                    newFullName += (i++).ToString();
+                }
+                try
+                {
+                    File.Move(sourceFullName, newFullName);
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
         }
 
         private void textBox3_TextChanged(object sender, EventArgs e)
@@ -590,14 +637,14 @@ namespace 檔案重新命名_WindowsFormsApplication1
             string xp = textBox1.Text;
             return (xp != "" || File.Exists(xp));
         }
-        //以相片檢視器開啟
+        //以相片檢視器開啟//Default apllication
         void openByDllhost()
         {
             if (chkFileExist())
                 Process.Start(textBox1.Text);
-                //Process.Start(Environment.GetFolderPath(
-                //    Environment.SpecialFolder.Windows) +
-                //    "\\System32\\dllhost.exe", textBox1.Text) ;
+            //Process.Start(Environment.GetFolderPath(
+            //    Environment.SpecialFolder.Windows) +
+            //    "\\System32\\dllhost.exe", textBox1.Text) ;
         }
 
         //以「Microsoft Office Picture Manager」開啟圖檔
@@ -608,10 +655,16 @@ namespace 檔案重新命名_WindowsFormsApplication1
             {
                 //Process.Start(@"C:\Program Files(x86)\Microsoft Office\Office12\OIS.exe",
                 //    pictureBox1.ImageLocation);
-                Process.Start(
-                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) +
-                @"\Microsoft Office\Office12\OIS.exe",
-            pictureBox1.ImageLocation);
+                string exefile = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) +
+                                @"\Microsoft Office\Office12\OIS.exe";
+                if (!File.Exists(exefile))
+                {
+                    MessageBox.Show("並未安裝 Microsoft Office Picture Manager！", "", MessageBoxButtons.OK, MessageBoxIcon.Stop, MessageBoxDefaultButton.Button1,
+                        //獨占式訊息視窗
+                        MessageBoxOptions.DefaultDesktopOnly);
+                    return;
+                }
+                Process.Start(exefile, pictureBox1.ImageLocation);
             }
         }
         //以小畫家開啟
@@ -635,18 +688,59 @@ namespace 檔案重新命名_WindowsFormsApplication1
             openByMsPaint();
         }
 
-        string destPath3="", destPath4="", sourcePath="";
+        string destPath3 = "", destPath4 = "", sourcePath = "";
+
+        private void textBox4_Click(object sender, EventArgs e)
+        {
+            textBox_Ciick_importPath_Movefile(ref textBox4);
+        }
+
+        private void textBox_Ciick_importPath_Movefile(ref wfrm.TextBox textBox)
+        {
+            //importPath
+            string x = Clipboard.GetText();
+            if ((textBox.Text == "" && Directory.Exists(x)) || (Directory.Exists(x) && x != textBox.Text))
+            {
+                textBox.Text = x;
+            }
+            //Movefile
+            else
+            {
+                if (Directory.Exists(textBox.Text) && File.Exists(textBox1.Text))
+                    movefileDestination(textBox1.Text, textBox.Text);
+            }
+        }
+
+        private void pictureBox1_LoadCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            label1Text_FileName();
+        }
+
+        private void label1Text_FileName()
+        {
+            if (imagesList.Count == 0) return;
+            string f = imagesList[imageIndex];
+            label1.Text = f.Substring(f.LastIndexOf("\\") + 1);
+        }
+
+        private void Form1_Activated(object sender, EventArgs e)
+        {
+            string d = Clipboard.GetText();
+            if (textBox1.Text == "要處理的資料夾路徑" && Directory.Exists(d))
+                textBox1.Text = d;
+        }
 
         private void textBox3_Click(object sender, EventArgs e)
         {
-            //if(ModifierKeys==Keys.Control)
+            textBox_Ciick_importPath_Movefile(ref textBox3);
+
         }
 
         private void textBox4_TextChanged(object sender, EventArgs e)
         {
-            
+
             if (Directory.Exists(textBox4.Text))
-            destPath4= textBox4.Text;
+                destPath4 = textBox4.Text;
         }
     }
 }
