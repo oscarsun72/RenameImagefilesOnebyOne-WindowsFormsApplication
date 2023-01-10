@@ -3,7 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -13,8 +16,8 @@ namespace 檔案重新命名_WindowsFormsApplication1
 {
     public partial class Form1 : Form
     {
-        string[] filesList;
-        List< string>imagesList=new List<string>();
+
+        List<string> imagesList = new List<string>();
         public Form1()
         {
             InitializeComponent();
@@ -72,7 +75,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         private void textBox1_Click(object sender, EventArgs e)
         {
-            textBox1.Text = "";
+            //textBox1.Text = "";
             textBox1.Text = Clipboard.GetText();
         }
         private void textBox2_Click(object sender, EventArgs e)
@@ -130,7 +133,49 @@ namespace 檔案重新命名_WindowsFormsApplication1
             {
                 this.Close();
             }
+
+            //瀏覽圖檔
+            switch (e.KeyCode)
+            {
+                case Keys.Home:
+                    //第一張圖檔
+                    if (imagesList.Count() == 0) return;
+                    imageIndex = 0;
+                    pictureBox1.ImageLocation = imagesList[imageIndex];
+                    //顯示圖檔全檔名
+                    textBox1.Text = pictureBox1.ImageLocation;
+                    break;
+                case Keys.End:
+                    //最後一張圖檔
+                    if (imagesList.Count() == 0) return;
+                    imageIndex = imagesList.Count - 1;
+                    pictureBox1.ImageLocation = imagesList[imageIndex];
+                    //顯示圖檔全檔名
+                    textBox1.Text = pictureBox1.ImageLocation;
+                    break;
+                case Keys.Down:
+                    nextImageShow();
+                    break;
+                case Keys.Right:
+                    nextImageShow();
+                    break;
+                case Keys.PageDown:
+                    nextImageShow();
+                    break;
+                case Keys.Up:
+                    previousImageShow();
+                    break;
+                case Keys.Left:
+                    previousImageShow();
+                    break;
+                case Keys.PageUp:
+                    previousImageShow();
+                    break;
+                default:
+                    break;
+            }
         }
+
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -354,50 +399,67 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            if (textBox1.Text == "")return;
-            //if (MessageBox.Show("是否開始資料夾內的檔案重新命名？", "重新命名", MessageBoxButtons.OKCancel) == DialogResult.OK)
-            //{
-                string path = textBox1.Text;
-                if (io.Directory.Exists(path))
+            if (textBox1.Text == "")
+            {
+                imagesList.Clear();
+                return;
+            }
+            //if (MessageBox.Show("是否開始資料夾內的檔案重新命名？", "重新命名", MessageBoxButtons.OKCancel) == DialogResult.Cancel) return;           
+            string path = textBox1.Text;
+            //處理資料夾內檔案
+            if (io.Directory.Exists(path))
+            {
+                string[] filesList;
+                filesList = io.Directory.GetFiles(path);
+                
+                foreach (var item in filesList)
                 {
-                    filesList= io.Directory.GetFiles(path);
-                    
-                    foreach (var item in filesList)
-                    {
-                        if ("jpg,png,bmp,gif,".IndexOf(item.Substring(item.Length - 3)) > -1)
-                            imagesList.Add(item);                        
-                    }
+                    if ("jpg,png,bmp,gif,".IndexOf(item.Substring(item.Length - 3), 0, StringComparison.CurrentCultureIgnoreCase) > -1)
+                        imagesList.Add(item);
                 }
-
-
-
-                foreach (string fstr in filesList) //io.Directory.GetFiles(path))
+                if (imagesList.Count == 0)
                 {
-                    if (fstr == "") continue;
-                    io.FileInfo f = new io.FileInfo(fstr);
-                    //if (f.LastAccessTime< DateTime.Today)
-                    //{
-                    switch (f.Extension)
-                    {
-                        case ".jpg":
-                            pictureBox1.ImageLocation = f.FullName;
-                            // pictureBox1.Image = new Bitmap( f.FullName);//二式皆可
-                            return;
-                        //break;
-                        case ".jpeg":
-                        case ".png":
-                        case ".bmp":
-                        case ".tif":
-                        case ".tiff":
-                        default:
-                            break;
-                    }
-                    //}
-
+                    MessageBox.Show("此資料夾內沒有圖檔！");
+                    return;
                 }
+                //若有圖檔則載入第一張圖檔
+                imageIndex = 0;
+                pictureBox1.ImageLocation = imagesList[imageIndex];
+                //foreach (string fstr in filesList) //io.Directory.GetFiles(path))
+                //{
+                //    if (fstr == "") continue;
+                //    io.FileInfo f = new io.FileInfo(fstr);
+                //    //if (f.LastAccessTime< DateTime.Today)
+                //    //{
+                //    switch (f.Extension)
+                //    {
+                //        case ".jpg":
+                //            pictureBox1.ImageLocation = f.FullName;
+                //            // pictureBox1.Image = new Bitmap( f.FullName);//二式皆可
+                //            return;
+                //        //break;
+                //        case ".jpeg":
+                //        case ".png":
+                //        case ".bmp":
+                //        case ".tif":
+                //        case ".tiff":
+                //        default:
+                //            break;
+                //    }
+                //    //}
+
+                //}
+            }
+            //處理單一檔案
+            else
+            {
+                //如果是輸入全檔名則載入該圖檔瀏覽
+                if (path != pictureBox1.ImageLocation)
+                    pictureBox1.ImageLocation = path;
+                //如果不是則僅限檢視目前圖檔全檔名
 
 
-            //}
+            }
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -405,13 +467,17 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         }
 
-        int imageIndex=0;
+        int imageIndex = 0;
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            if (imagesList.Count()== 0) return;
-            //next image
-            pictureBox1.ImageLocation = filesList[imageIndex++];
+            if (ModifierKeys == Keys.Control)
+            {//以小畫家開啟
 
+                Process.Start(Environment.GetFolderPath(Environment.SpecialFolder.Windows) +
+                    "\\system32\\mspaint.exe",
+                    pictureBox1.ImageLocation);
+                return;
+            }
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
@@ -424,6 +490,101 @@ namespace 檔案重新命名_WindowsFormsApplication1
             {
 
             }
+        }
+
+        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
+        {
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                    if (ModifierKeys == Keys.None)
+                    {
+                        nextImageShow();
+                    }
+                    break;
+                case MouseButtons.None:
+                    break;
+                case MouseButtons.Right:
+                    if (ModifierKeys == Keys.None)
+                    {
+                        previousImageShow();
+                    }
+                    break;
+                case MouseButtons.Middle:
+                    break;
+                case MouseButtons.XButton1:
+                    break;
+                case MouseButtons.XButton2:
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        private void previousImageShow()
+        {
+            if (imagesList.Count() == 0) return;
+            if (imageIndex < 0) { imageIndex = 0; return; }
+            //next image            
+            pictureBox1.ImageLocation = imagesList[--imageIndex];
+            //顯示圖檔全檔名
+            textBox1.Text = pictureBox1.ImageLocation;
+            //throw new NotImplementedException();
+        }
+        private void nextImageShow()
+        {
+            if (imagesList.Count() == 0) return;
+            if (imageIndex > imagesList.Count - 1) { imageIndex = imagesList.Count(); return; }
+            //next image
+            pictureBox1.ImageLocation = imagesList[++imageIndex];
+            //顯示圖檔全檔名
+            textBox1.Text = pictureBox1.ImageLocation;
+            //throw new NotImplementedException();
+        }
+
+        private void pictureBox1_DoubleClick(object sender, EventArgs e)
+        {
+            if (pictureBox1.ImageLocation != "")
+            {
+
+                switch (ModifierKeys)
+                {
+                    case Keys.NoName:
+                        //以Windows系統預設的程式 （「相片檢視器」）開啟圖檔
+                        Process.Start(pictureBox1.ImageLocation);
+                        break;
+                    case Keys.Control:
+                        //以「Microsoft Office Picture Manager」開啟圖檔
+                        //Process.Start(@"C:\Program Files(x86)\Microsoft Office\Office12\OIS.exe",
+                        //    pictureBox1.ImageLocation);
+                        Process.Start(
+                        Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) +
+                        @"\Microsoft Office\Office12\OIS.exe",
+                    pictureBox1.ImageLocation);
+                        break;
+
+                    default:
+                        break;
+                }
+
+            }
+
+        }
+
+
+
+        void movefileDest(string fullName, string dirDestination)
+        {
+            string fileName = fullName.Substring(fullName.LastIndexOf("\\") + 1);
+            string newFullName = dirDestination + "\\" + fileName;
+            //if(File.Exists())
+            //File.Move();
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
