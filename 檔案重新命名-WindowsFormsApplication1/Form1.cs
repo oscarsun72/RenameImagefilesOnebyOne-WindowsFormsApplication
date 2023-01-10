@@ -32,13 +32,20 @@ namespace 檔案重新命名_WindowsFormsApplication1
             InitializeComponent();
             //202301110121 creedit chatGPT：Read Excel into C# code：
             string filePath = "H:\\共用雲端硬碟\\黃老師遠端工作\\沛榮相片整理重新命名用資料表.xlsx";
+            //華岡學習雲
             if (!File.Exists(filePath))
-                filePath = "G:\\共用雲端硬碟\\黃老師遠端工作\\沛榮相片整理重新命名用資料表.xlsx";
+                //filePath = "G:\\共用雲端硬碟\\黃老師遠端工作\\沛榮相片整理重新命名用資料表.xlsx";
+                filePath = "G:\\共用雲端硬碟\\黃老師遠端工作\\沛榮相片整理重新命名用資料表.xls";
+            //黃老師電腦
             if (!File.Exists(filePath))
                 filePath = "K:\\共用雲端硬碟\\黃老師遠端工作\\沛榮相片整理重新命名用資料表.xlsx";
-
-            string connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + filePath + ";" +
+            string connectionString;
+            if (Path.GetExtension(filePath) != ".xls")
+                connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + filePath + ";" +
                                         "Extended Properties='Excel 12.0;HDR=YES;IMEX=1'";
+            else
+                connectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + filePath + ";" +
+                                            "Extended Properties='Excel 8.0;HDR=YES;IMEX=1'";
 
             using (OleDbConnection connection = new OleDbConnection(connectionString))
             {
@@ -111,9 +118,10 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         }
 
-        void renameFilename()
+        string renameFilename()
         {//202301110401 creedit chatGPT：重命名檔案名稱：
             string oldfullName = pictureBox1.ImageLocation;
+            if (!File.Exists(oldfullName)) return "";
             string newFullName = Path.Combine(Path.GetDirectoryName(oldfullName), textBox2.Text + Path.GetExtension(oldfullName));
             int i = 0;
             while (File.Exists(newFullName))
@@ -124,8 +132,9 @@ namespace 檔案重新命名_WindowsFormsApplication1
             {
                 File.Copy(oldfullName, newFullName);
                 File.Delete(oldfullName);
+                nextImageShow();
                 //開啟檔案總管檢視，重新命名的檔案會被選取
-                System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{newFullName}\"");
+                //System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{newFullName}\"");
             }
             //catch (Exception ex)
             //{
@@ -145,11 +154,17 @@ namespace 檔案重新命名_WindowsFormsApplication1
             {
                 throw;
             }
+            return newFullName;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            renameFilename();
+            if (ModifierKeys == Keys.None)
+                renameFilename();
+            else//開啟檔案總管檢視，重新命名的檔案會被選取
+            { renameFilename(); System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{newFullName}\""); }
+
+
             ////test the pull request!
             //if (io.Directory.Exists(textBox1.Text) && io.Directory.Exists(textBox2.Text))
             //{
@@ -287,14 +302,10 @@ namespace 檔案重新命名_WindowsFormsApplication1
             }
         }
 
-
-        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            comboBox_Click(sender);
-        }
+               
 
         //202301110321 creedit chatGPT：簡化comboBox事件處理：
-        private void comboBox_Click(object sender)//(wfrm.ComboBox cmbx)
+        private void comboBox_Click_SelectedIndexChanged(object sender, EventArgs e)//(wfrm.ComboBox cmbx)
         {
             string x = ((wfrm.ComboBox)sender).SelectedValue.ToString();
             if (textBox2.Text == "重新命名預覽")
@@ -305,7 +316,10 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         }
 
-
+        private void comboBox_Click(object sender, EventArgs e)//(wfrm.ComboBox cmbx)
+        {
+            ((wfrm.ComboBox)sender).DroppedDown = true;            
+        }
 
         class SimpleList : IList //https://docs.microsoft.com/zh-tw/dotnet/api/system.collections.ilist?view=netframework-4.8
         {
@@ -483,28 +497,8 @@ namespace 檔案重新命名_WindowsFormsApplication1
                 Console.WriteLine();
             }
         }
-
-        private void comboBox1_Click(object sender, EventArgs e)
-        {
-            //comboBox1.DroppedDown=true;
-
-        }
-
-        private void comboBox1_SelectedValueChanged(object sender, EventArgs e)
-        {
-            comboBox_Click(sender);
-        }
-
-        private void comboBox1_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Middle)
-            {
-                comboBox_Click(comboBox1);
-
-            }
-
-        }
-
+               
+        
         private void comboBox1_Click_1(object sender, EventArgs e)
         {
             comboBox1.DroppedDown = true;
@@ -933,29 +927,12 @@ namespace 檔案重新命名_WindowsFormsApplication1
                     selectFileInExplorer(textBox3.Text, newFullName);
         }
 
-        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
+                
+
+        private void comboBox7_Click(object sender, EventArgs e)
         {
-            comboBox_Click(sender);
+            comboBox_Click(sender,e);
         }
 
-        private void comboBox7_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            comboBox_Click(sender);
-        }
-
-        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            comboBox_Click(sender);
-        }
-
-        private void comboBox6_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            comboBox_Click(sender);
-        }
-
-        private void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            comboBox_Click(sender);
-        }
     }
 }

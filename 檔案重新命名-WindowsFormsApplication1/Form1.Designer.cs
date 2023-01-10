@@ -69,7 +69,7 @@
             this.label1.Location = new System.Drawing.Point(9, 17);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(135, 16);
+            this.label1.Size = new System.Drawing.Size(136, 16);
             this.label1.TabIndex = 1;
             this.label1.Text = "方便重新命名檔案";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -113,7 +113,7 @@
             this.checkBox1.Location = new System.Drawing.Point(285, 775);
             this.checkBox1.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(106, 20);
+            this.checkBox1.Size = new System.Drawing.Size(107, 20);
             this.checkBox1.TabIndex = 4;
             this.checkBox1.Text = "最上層顯示";
             this.checkBox1.UseVisualStyleBackColor = true;
@@ -141,10 +141,8 @@
             this.comboBox1.Size = new System.Drawing.Size(144, 27);
             this.comboBox1.TabIndex = 7;
             this.comboBox1.Text = "本家";
-            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
-            this.comboBox1.SelectedValueChanged += new System.EventHandler(this.comboBox1_SelectedValueChanged);
-            this.comboBox1.Click += new System.EventHandler(this.comboBox1_Click_1);
-            this.comboBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.comboBox1_MouseDown);
+            this.comboBox1.SelectedValueChanged += new System.EventHandler(this.comboBox_Click_SelectedIndexChanged);
+            this.comboBox1.Click += new System.EventHandler(this.comboBox_Click);
             // 
             // comboBox2
             // 
@@ -155,7 +153,8 @@
             this.comboBox2.Size = new System.Drawing.Size(144, 27);
             this.comboBox2.TabIndex = 8;
             this.comboBox2.Text = "家人";
-            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
+            this.comboBox2.SelectedValueChanged += new System.EventHandler(this.comboBox_Click_SelectedIndexChanged);
+            this.comboBox2.Click += new System.EventHandler(this.comboBox_Click);
             // 
             // comboBox3
             // 
@@ -166,7 +165,8 @@
             this.comboBox3.Size = new System.Drawing.Size(148, 27);
             this.comboBox3.TabIndex = 9;
             this.comboBox3.Text = "師友生_臺大";
-            this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.comboBox3_SelectedIndexChanged);
+            this.comboBox3.SelectedValueChanged += new System.EventHandler(this.comboBox_Click_SelectedIndexChanged);
+            this.comboBox3.Click += new System.EventHandler(this.comboBox_Click);
             // 
             // comboBox4
             // 
@@ -177,7 +177,8 @@
             this.comboBox4.Size = new System.Drawing.Size(239, 27);
             this.comboBox4.TabIndex = 10;
             this.comboBox4.Text = "師友生_臺灣學術界";
-            this.comboBox4.SelectedIndexChanged += new System.EventHandler(this.comboBox4_SelectedIndexChanged);
+            this.comboBox4.SelectedValueChanged += new System.EventHandler(this.comboBox_Click_SelectedIndexChanged);
+            this.comboBox4.Click += new System.EventHandler(this.comboBox_Click);
             // 
             // comboBox5
             // 
@@ -188,7 +189,8 @@
             this.comboBox5.Size = new System.Drawing.Size(148, 27);
             this.comboBox5.TabIndex = 11;
             this.comboBox5.Text = "師友生_其他學術界";
-            this.comboBox5.SelectedIndexChanged += new System.EventHandler(this.comboBox5_SelectedIndexChanged);
+            this.comboBox5.SelectedValueChanged += new System.EventHandler(this.comboBox_Click_SelectedIndexChanged);
+            this.comboBox5.Click += new System.EventHandler(this.comboBox_Click);
             // 
             // comboBox6
             // 
@@ -199,7 +201,8 @@
             this.comboBox6.Size = new System.Drawing.Size(237, 27);
             this.comboBox6.TabIndex = 12;
             this.comboBox6.Text = "會議";
-            this.comboBox6.SelectedIndexChanged += new System.EventHandler(this.comboBox6_SelectedIndexChanged);
+            this.comboBox6.SelectedValueChanged += new System.EventHandler(this.comboBox_Click_SelectedIndexChanged);
+            this.comboBox6.Click += new System.EventHandler(this.comboBox_Click);
             // 
             // textBox3
             // 
@@ -287,7 +290,8 @@
             this.comboBox7.Size = new System.Drawing.Size(199, 27);
             this.comboBox7.TabIndex = 18;
             this.comboBox7.Text = "其他";
-            this.comboBox7.SelectedIndexChanged += new System.EventHandler(this.comboBox7_SelectedIndexChanged);
+            this.comboBox7.SelectedValueChanged += new System.EventHandler(this.comboBox_Click_SelectedIndexChanged);
+            this.comboBox7.Click += new System.EventHandler(this.comboBox_Click);
             // 
             // Form1
             // 
