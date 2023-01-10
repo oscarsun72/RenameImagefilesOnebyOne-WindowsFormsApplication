@@ -58,6 +58,8 @@ namespace 檔案重新命名_WindowsFormsApplication1
                         SimpleList family = new SimpleList(), families = new SimpleList(), ntu = new SimpleList()
                         , tw = new SimpleList(), cademia = new SimpleList(), conference = new SimpleList()
                         , others = new SimpleList();
+                        family.Add("1本家"); families.Add("2家人"); ntu.Add("3師友生_臺大"); tw.Add("4師友生_臺灣學術界");
+                        cademia.Add("5師友生_其他學術界"); conference.Add("6會議 "); others.Add("7其他");
                         while (reader.Read())
                         {
                             if (reader[0].ToString() != "")
@@ -89,6 +91,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
                         comboBox5.MaxDropDownItems = cademia.Count < 101 ? cademia.Count : 100;
                         comboBox6.MaxDropDownItems = conference.Count < 101 ? conference.Count : 100;
                         comboBox7.MaxDropDownItems = others.Count < 101 ? others.Count : 100;
+                        textBox2.Text = "重新命名預覽";
                     }
                 }
             }
@@ -108,14 +111,45 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         }
 
+        void renameFilename()
+        {//202301110401 creedit chatGPT：重命名檔案名稱：
+            string oldfullName = pictureBox1.ImageLocation;
+            string newFullName = Path.Combine(Path.GetDirectoryName(oldfullName), textBox2.Text + Path.GetExtension(oldfullName));
+            int i = 0;
+            while (File.Exists(newFullName))
+            {
+                newFullName = Path.Combine(Path.GetDirectoryName(oldfullName), textBox2.Text + i++ + Path.GetExtension(oldfullName));
+            }
+            try
+            {
+                File.Copy(oldfullName, newFullName);
+                File.Delete(oldfullName);
+                //開啟檔案總管檢視，重新命名的檔案會被選取
+                System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{newFullName}\"");
+            }
+            //catch (Exception ex)
+            //{
+            //    // handle exception
+            //}
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
+            //try
+            //{
+            //    File.Copy(oldfullName, newFullName);
+            //    File.Delete(oldfullName);
+            //    if(prcssDownloadImgFullName==null)
+            //    prcssDownloadImgFullName = System.Diagnostics.Process.Start("Explorer.exe", $"/e, /select ,{newFullName}");
+            //    else
+            //        prcssDownloadImgFullName.Start("Explorer.exe", $"/e, /select ,{newFullName}");
+            //}
+            catch (Exception)
+            {
+                throw;
+            }
         }
+
         private void button1_Click(object sender, EventArgs e)
         {
-
+            renameFilename();
             ////test the pull request!
             //if (io.Directory.Exists(textBox1.Text) && io.Directory.Exists(textBox2.Text))
             //{
@@ -256,18 +290,18 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            comboBox_Click(sender);
         }
 
-
-        private void comboBox_Click(wfrm.ComboBox cmbx)
+        //202301110321 creedit chatGPT：簡化comboBox事件處理：
+        private void comboBox_Click(object sender)//(wfrm.ComboBox cmbx)
         {
-            string x = cmbx.SelectedValue.ToString();
+            string x = ((wfrm.ComboBox)sender).SelectedValue.ToString();
             if (textBox2.Text == "重新命名預覽")
             {
                 textBox2.Text = "";
             }
-            textBox2.Text = textBox2.Text + x;
+            textBox2.Text += x;
 
         }
 
@@ -458,7 +492,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         private void comboBox1_SelectedValueChanged(object sender, EventArgs e)
         {
-            comboBox_Click(comboBox1);
+            comboBox_Click(sender);
         }
 
         private void comboBox1_MouseDown(object sender, MouseEventArgs e)
@@ -901,27 +935,27 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            comboBox_Click(sender);
         }
 
         private void comboBox7_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            comboBox_Click(sender);
         }
 
         private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            comboBox_Click(sender);
         }
 
         private void comboBox6_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            comboBox_Click(sender);
         }
 
         private void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            comboBox_Click(sender);
         }
     }
 }
