@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using wfrm = System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using io = System.IO;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace 檔案重新命名_WindowsFormsApplication1
 {
@@ -23,6 +24,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
         //副檔名清單
         readonly string[] imgExt = { ".jpg", ".png", ".bmp", ".gif", ".tif", ".tiff", ".jpeg" };
         List<string> imagesList = new List<string>();
+        string sourcePath = "";
         public Form1()
         {
             InitializeComponent();
@@ -137,7 +139,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
         {
             if (e.KeyCode == Keys.Escape)
             {
-                if (MessageBox.Show("結束應用程式？", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly)
+                if (MessageBox.Show("結束應用程式？", "確定結束？", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly)
                     == DialogResult.OK)
                     this.Close();
             }
@@ -417,37 +419,13 @@ namespace 檔案重新命名_WindowsFormsApplication1
             //處理資料夾內檔案
             if (io.Directory.Exists(path))
             {
-
-                sourcePath = path;
-                string[] filesList;
-                filesList = io.Directory.GetFiles(path);
-                if (imagesList.Count() > 0) clearImageList();
-                foreach (var fileName in filesList)
-                {
-                    //if ( "jpg,png,bmp,gif,tif".IndexOf(item.Substring(item.Length - 3), 0, 
-                    //    //不分大小寫
-                    //    StringComparison.CurrentCultureIgnoreCase) > -1)
-                    //202301100950 creedit chatGPT ：C# Find Array Element IgnoreCase：
-                    if (imgExt.Any(x => x.Equals(
-                        //chatGPT：C# 取得檔案副檔名：C# 中有一個名為 Path 類別，它提供了用來操作文件路徑和文件名的方法。您可以使用 Path.GetExtension 方法來取得文件的副檔名。
-                        Path.GetExtension(fileName), StringComparison.OrdinalIgnoreCase)))
-                        imagesList.Add(fileName);
-
-                }
-                if (imagesList.Count == 0)
-                {
-                    MessageBox.Show("此資料夾內沒有圖檔！");
-                    return;
-                }
-
+                if (!loadImageList(path)) return;
                 //若有圖檔則載入第一張圖檔
                 imageIndex = 0;
                 pictureBox1.ImageLocation = imagesList[imageIndex];
                 textBox1.Text = pictureBox1.ImageLocation;
-                //顯示來源資料夾路徑                
-                Text = sourcePath;
-                //顯示正在顯示處理之檔名（不含路徑）
-                label1Text_FileName();
+
+
                 //foreach (string fstr in filesList) //io.Directory.GetFiles(path))
                 //{
                 //    if (fstr == "") continue;
@@ -575,41 +553,90 @@ namespace 檔案重新命名_WindowsFormsApplication1
         }
 
         private void pictureBox1_DoubleClick(object sender, EventArgs e)
-        {
-            if (pictureBox1.ImageLocation != "")
-            {
-                switch (ModifierKeys)
-                {
-                    case Keys.None:
-                        //以Windows系統預設的程式 （「相片檢視器」）開啟圖檔
-                        Process.Start(pictureBox1.ImageLocation);
-                        break;
-                    case Keys.Control:
-                        openByMicrosoftOfficePictureManager();
-                        break;
+        {//會與Click事件干擾，取消操作，且開啟檔案已設置專屬按鈕，不必於此再操作。有需求再說
+            //MouseEventArgs ee = (MouseEventArgs)e;
+            //if (pictureBox1.ImageLocation != "")
+            //{
+            //    switch (ModifierKeys)
+            //    {
+            //        case Keys.None:
+            //            //以Windows系統預設的程式 （「相片檢視器」）開啟圖檔
+            //            if (ee.Button == MouseButtons.Left)
+            //            {
+            //                Process.Start(pictureBox1.ImageLocation);
+            //            }
+            //            break;
+            //        case Keys.Control:
+            //            openByMicrosoftOfficePictureManager();
+            //            break;
 
-                    default:
-                        break;
-                }
+            //        default:
+            //            break;
+            //    }
 
-            }
+            //}
 
         }
 
+        bool loadImageList(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                MessageBox.Show("資料夾路徑有誤，請重新貼到textBox1(即「要處理的資料夾路徑」文字框)");
+                return false;
+            }
+            sourcePath = path;
+            string[] filesList;
+            filesList = io.Directory.GetFiles(path);
+            if (imagesList.Count() > 0) clearImageList();
+            foreach (var fileName in filesList)
+            {
+                //if ( "jpg,png,bmp,gif,tif".IndexOf(item.Substring(item.Length - 3), 0, 
+                //    //不分大小寫
+                //    StringComparison.CurrentCultureIgnoreCase) > -1)
+                //202301100950 creedit chatGPT ：C# Find Array Element IgnoreCase：
+                if (imgExt.Any(x => x.Equals(
+                    //chatGPT：C# 取得檔案副檔名：C# 中有一個名為 Path 類別，它提供了用來操作文件路徑和文件名的方法。您可以使用 Path.GetExtension 方法來取得文件的副檔名。
+                    Path.GetExtension(fileName), StringComparison.OrdinalIgnoreCase)))
+                    imagesList.Add(fileName);
 
+            }
+            if (imagesList.Count == 0)
+            {
+                MessageBox.Show("此資料夾內沒有圖檔！");
+                return true;
+            }
+            //顯示目前正在處理的資料夾路徑
+            this.Text = sourcePath;
+            //顯示正在顯示處理之檔名（不含路徑）
+            label1Text_FileName();
+            return true;
+        }
 
+        int currentImageIndex;
         void movefileDestination(string sourceFullName, string dirDestination)
         {
+            if (dirDestination == sourcePath)
+            {
+                MessageBox.Show("來源與目的地的路徑相同，請重新指定！", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             if (File.Exists(sourceFullName) && Directory.Exists(dirDestination))
             {
-                string fileName = sourceFullName.Substring(sourceFullName.LastIndexOf("\\") + 1);
-                string newFullName = dirDestination + "\\" + fileName;
+                string fileName = Path.GetFileName(sourceFullName);//sourceFullName.Substring(sourceFullName.LastIndexOf("\\") + 1);
+                string newFullName = dirDestination.Substring(dirDestination.Length-1,1)=="\\"
+                    ? dirDestination +  fileName:dirDestination + "\\" + fileName;
                 //如果目的地已有同檔名者：
                 int i = 0;
+                //避免檔名衝突
                 while (File.Exists(newFullName))
                 {
-                    newFullName += (i++).ToString();
+                    newFullName = dirDestination + Path.GetFileNameWithoutExtension(newFullName) + (i++).ToString() + Path.GetExtension(newFullName);
                 }
+                if (imageIndex == imagesList.Count() - 1)//取得目前圖檔在清單中的位置,以便/重新載入圖檔清單時顯示被刪除的下一張圖檔，若沒有下一張則顯示前一張
+                    currentImageIndex = --imageIndex;
+                else
+                    currentImageIndex = imageIndex < 0 ? 0 : imageIndex;
                 try
                 {
                     File.Move(sourceFullName, newFullName);
@@ -619,13 +646,19 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
                     throw;
                 }
+                //重新載入圖檔清單並顯示被刪除的下一張圖檔，若沒有下一張則顯示前一張
+                if (!loadImageList(sourcePath)) return;
+                //若有圖檔則載入被刪除的後一張圖檔
+                imageIndex = currentImageIndex;
+                pictureBox1.ImageLocation = imagesList[currentImageIndex];
+                textBox1.Text = pictureBox1.ImageLocation;
+
             }
         }
 
         private void textBox3_TextChanged(object sender, EventArgs e)
         {
-            if (Directory.Exists(textBox3.Text))
-                destPath3 = textBox3.Text;
+
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -688,8 +721,6 @@ namespace 檔案重新命名_WindowsFormsApplication1
             openByMsPaint();
         }
 
-        string destPath3 = "", destPath4 = "", sourcePath = "";
-
         private void textBox4_Click(object sender, EventArgs e)
         {
             textBox_Ciick_importPath_Movefile(ref textBox4);
@@ -701,7 +732,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
             string x = Clipboard.GetText();
             if ((textBox.Text == "" && Directory.Exists(x)) || (Directory.Exists(x) && x != textBox.Text))
             {
-                textBox.Text = x;
+                textBox.Text = x;Clipboard.Clear();
             }
             //Movefile
             else
@@ -739,8 +770,6 @@ namespace 檔案重新命名_WindowsFormsApplication1
         private void textBox4_TextChanged(object sender, EventArgs e)
         {
 
-            if (Directory.Exists(textBox4.Text))
-                destPath4 = textBox4.Text;
         }
     }
 }
