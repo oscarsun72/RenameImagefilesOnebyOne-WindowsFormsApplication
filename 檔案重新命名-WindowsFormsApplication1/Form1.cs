@@ -411,6 +411,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
             //處理資料夾內檔案
             if (io.Directory.Exists(path))
             {
+                sourcePath = path;
                 string[] filesList;
                 filesList = io.Directory.GetFiles(path);
 
@@ -576,7 +577,8 @@ namespace 檔案重新命名_WindowsFormsApplication1
 
         private void textBox3_TextChanged(object sender, EventArgs e)
         {
-
+            if (Directory.Exists(textBox3.Text))
+                destPath3 = textBox3.Text;
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -592,8 +594,10 @@ namespace 檔案重新命名_WindowsFormsApplication1
         void openByDllhost()
         {
             if (chkFileExist())
-                Process.Start(Environment.GetFolderPath(Environment.SpecialFolder.Windows) +
-                    "\\System32\\dllhost.exe", textBox1.Text) ;
+                Process.Start(textBox1.Text);
+                //Process.Start(Environment.GetFolderPath(
+                //    Environment.SpecialFolder.Windows) +
+                //    "\\System32\\dllhost.exe", textBox1.Text) ;
         }
 
         //以「Microsoft Office Picture Manager」開啟圖檔
@@ -629,6 +633,20 @@ namespace 檔案重新命名_WindowsFormsApplication1
         private void button2_Click(object sender, EventArgs e)
         {
             openByMsPaint();
+        }
+
+        string destPath3="", destPath4="", sourcePath="";
+
+        private void textBox3_Click(object sender, EventArgs e)
+        {
+            //if(ModifierKeys==Keys.Control)
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            
+            if (Directory.Exists(textBox4.Text))
+            destPath4= textBox4.Text;
         }
     }
 }

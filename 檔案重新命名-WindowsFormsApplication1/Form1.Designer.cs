@@ -210,6 +210,7 @@
             this.textBox3.Size = new System.Drawing.Size(464, 31);
             this.textBox3.TabIndex = 13;
             this.textBox3.Text = "要移動到的資料夾路徑";
+            this.textBox3.Click += new System.EventHandler(this.textBox3_Click);
             this.textBox3.TextChanged += new System.EventHandler(this.textBox3_TextChanged);
             // 
             // textBox4
@@ -222,6 +223,7 @@
             this.textBox4.Size = new System.Drawing.Size(464, 31);
             this.textBox4.TabIndex = 14;
             this.textBox4.Text = "要移動到的資料夾路徑";
+            this.textBox4.TextChanged += new System.EventHandler(this.textBox4_TextChanged);
             // 
             // button4
             // 
