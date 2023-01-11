@@ -17,7 +17,7 @@ using io = System.IO;
 using static System.Net.Mime.MediaTypeNames;
 using System.Data.OleDb;
 
-namespace 檔案重新命名_WindowsFormsApplication1
+namespace 圖檔重新命名_WindowsFormsApplication1
 {
     public partial class Form1 : wfrm.Form
     {
@@ -65,6 +65,7 @@ namespace 檔案重新命名_WindowsFormsApplication1
                         SimpleList family = new SimpleList(), families = new SimpleList(), ntu = new SimpleList()
                         , tw = new SimpleList(), cademia = new SimpleList(), conference = new SimpleList()
                         , others = new SimpleList();
+                        // Populate the List
                         family.Add("1本家"); families.Add("2家人"); ntu.Add("3師友生_臺大"); tw.Add("4師友生_臺灣學術界");
                         cademia.Add("5師友生_其他學術界"); conference.Add("6會議 "); others.Add("7其他");
                         while (reader.Read())
@@ -98,20 +99,11 @@ namespace 檔案重新命名_WindowsFormsApplication1
                         comboBox5.MaxDropDownItems = cademia.Count < 101 ? cademia.Count : 100;
                         comboBox6.MaxDropDownItems = conference.Count < 101 ? conference.Count : 100;
                         comboBox7.MaxDropDownItems = others.Count < 101 ? others.Count : 100;
-                        textBox2.Text = "重新命名預覽";
+                        textBox2.Text = "重新命名預覽";                        
                     }
                 }
             }
-            //// Populate the List            
-            //family.Add("沛榮");
-            //family.Add("玫儀");
-            //family.Add("靖F");
-            //family.Add("JT");
-            //family.Add("five");
-            //family.Add("six");
-            //family.Add("seven");
-            //family.Add("eight");
-            //family.PrintContents();
+            
 
 
             pictureBox1.MouseWheel += new MouseEventHandler(pictureBox1_MouseWheel);

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace 檔案重新命名_WindowsFormsApplication.Properties {
+namespace 圖檔重新命名_WindowsFormsApplication.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace 檔案重新命名_WindowsFormsApplication.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("檔案重新命名_WindowsFormsApplication.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("圖檔重新命名_WindowsFormsApplication.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

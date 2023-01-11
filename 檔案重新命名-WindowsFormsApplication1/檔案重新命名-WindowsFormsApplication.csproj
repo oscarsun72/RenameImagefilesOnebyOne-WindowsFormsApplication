@@ -8,8 +8,8 @@
     <ProjectGuid>{F2F47F43-8F05-4D66-B4ED-B00AF1482ACD}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>檔案重新命名_WindowsFormsApplication</RootNamespace>
-    <AssemblyName>檔案重新命名-WindowsFormsApplication</AssemblyName>
+    <RootNamespace>圖檔重新命名_WindowsFormsApplication</RootNamespace>
+    <AssemblyName>圖檔重新命名-WindowsFormsApplication</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>

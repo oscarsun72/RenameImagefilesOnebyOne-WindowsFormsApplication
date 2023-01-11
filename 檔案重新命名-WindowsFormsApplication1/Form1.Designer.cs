@@ -1,4 +1,4 @@
-﻿namespace 檔案重新命名_WindowsFormsApplication1
+﻿namespace 圖檔重新命名_WindowsFormsApplication1
 {
     partial class Form1
     {
@@ -69,7 +69,7 @@
             this.label1.Location = new System.Drawing.Point(9, 17);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(136, 16);
+            this.label1.Size = new System.Drawing.Size(135, 16);
             this.label1.TabIndex = 1;
             this.label1.Text = "方便重新命名檔案";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -113,7 +113,7 @@
             this.checkBox1.Location = new System.Drawing.Point(285, 775);
             this.checkBox1.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(107, 20);
+            this.checkBox1.Size = new System.Drawing.Size(106, 20);
             this.checkBox1.TabIndex = 4;
             this.checkBox1.Text = "最上層顯示";
             this.checkBox1.UseVisualStyleBackColor = true;
@@ -322,7 +322,7 @@
             this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
-            this.Text = "檔案重新命名";
+            this.Text = "圖檔重新命名";
             this.Activated += new System.EventHandler(this.Form1_Activated);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace 檔案重新命名_WindowsFormsApplication1
+namespace 圖檔重新命名_WindowsFormsApplication1
 {
     static class Program
     {

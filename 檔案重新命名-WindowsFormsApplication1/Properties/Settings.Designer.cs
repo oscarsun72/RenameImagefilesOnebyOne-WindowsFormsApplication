@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace 檔案重新命名_WindowsFormsApplication.Properties {
+namespace 圖檔重新命名_WindowsFormsApplication.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
