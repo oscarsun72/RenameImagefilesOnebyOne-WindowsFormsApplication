@@ -52,7 +52,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>檔案汰重.ico</ApplicationIcon>
+    <ApplicationIcon>Custom-Icon-Design-Pretty-Office-4-Rename-move-imagefiles.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -122,6 +122,7 @@
     <None Include="Resources\x.png" />
     <None Include="Resources\x1.png" />
     <None Include="Resources\x2.png" />
+    <Content Include="Custom-Icon-Design-Pretty-Office-4-Rename-move-imagefiles.ico" />
     <Content Include="檔案汰重.ico" />
   </ItemGroup>
   <ItemGroup>
