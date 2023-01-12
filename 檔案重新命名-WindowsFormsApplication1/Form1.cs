@@ -99,11 +99,11 @@ namespace 圖檔重新命名_WindowsFormsApplication1
                         comboBox5.MaxDropDownItems = cademia.Count < 101 ? cademia.Count : 100;
                         comboBox6.MaxDropDownItems = conference.Count < 101 ? conference.Count : 100;
                         comboBox7.MaxDropDownItems = others.Count < 101 ? others.Count : 100;
-                        textBox2.Text = "重新命名預覽";                        
+                        textBox2.Text = "重新命名預覽";
                     }
                 }
             }
-            
+
 
 
             pictureBox1.MouseWheel += new MouseEventHandler(pictureBox1_MouseWheel);
@@ -235,11 +235,6 @@ namespace 圖檔重新命名_WindowsFormsApplication1
         {
             string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop);
             this.textBox2.Text = filePaths[0];
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -904,7 +899,8 @@ namespace 圖檔重新命名_WindowsFormsApplication1
 
         void selectFileInExplorer(string dir, string fullname = "")
         {
-            if (File.Exists(fullname)) { 
+            if (File.Exists(fullname))
+            {
                 //檔案總管中將已其選取
                 //https://www.ruyut.com/2022/05/csharp-open-in-file-explorer.html
                 //把之前開過的關閉
@@ -932,5 +928,62 @@ namespace 圖檔重新命名_WindowsFormsApplication1
         }
 
 
+        /* 實作： 若在「重新命名預覽」想要保留原檔名前綴數字的部分，以便歸類排序尋找篩選……，則可點擊此「方便重新命名檔案」二下，亦會以後綴方式自動填入下方
+         * 「重新命名預覽」方塊框中 20230112*/
+        private void label1_DoubleClick(object sender, EventArgs e)
+        {
+            if (ModifierKeys == Keys.None)
+            {
+                //creedit chatGPT：
+                string input = label1.Text, result = "";
+                bool isNum = true;
+                for (int i = 0; i < input.Length; i++)
+                {
+                    if (!Char.IsDigit(input[i]) && input[i] != '.')
+                    {
+                        isNum = false;
+                        break;
+                    }
+                    result += input[i];
+                }
+                if (result != "") Clipboard.SetText(result);
+            }
+        }
+
+        private void label1_MouseDown(object sender, MouseEventArgs e)
+        {
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                    switch (ModifierKeys)
+                    {
+                        //實作： 在「方便重新命名檔案」處若是顯示為正在檢視的圖片檔名（含副檔名），則滑鼠左鍵點一下，即可將其檔名（不含副檔名）的部分複製到剪貼簿以備用。
+                        case Keys.None:
+                            if (label1.Text != "方便重新命名檔案")
+                            Clipboard.SetText(Path.GetFileNameWithoutExtension(label1.Text));
+                            break;
+                        //實作： 若按下前按住 Ctrl 鍵，則可直接貼入下方的「重新命名預覽」作為原有文字之後綴，以便編輯。
+                        case Keys.Control:
+                            if (label1.Text != "方便重新命名檔案")
+                                textBox2.Text += Path.GetFileNameWithoutExtension(label1.Text);
+                            break;
+                    }
+                    break;
+                case MouseButtons.None:
+                    break;
+                case MouseButtons.Right:
+                    break;
+                case MouseButtons.Middle:
+                    break;
+                case MouseButtons.XButton1:
+                    break;
+                case MouseButtons.XButton2:
+                    break;
+                default:
+                    break;
+            }
+
+
+        }
     }
 }

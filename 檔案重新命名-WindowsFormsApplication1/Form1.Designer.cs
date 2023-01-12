@@ -73,7 +73,8 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "方便重新命名檔案";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            this.label1.DoubleClick += new System.EventHandler(this.label1_DoubleClick);
+            this.label1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.label1_MouseDown);
             // 
             // textBox1
             // 
