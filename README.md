@@ -1,4 +1,5 @@
-# rename_files_batch-WindowsFormsApplication
+# RenameImagefilesOnebyOne-WindowsFormsApplication
+（原作：rename_files_batch-WindowsFormsApplication。今202301121115 = 2023/1/12 11:15 改訂以符實。感恩感恩　南無阿彌陀佛）
 **圖檔重新命名（原名：檔案重新命名）**
 
 For those who need to search for images by file name, it should work well. In particular, there are a large number of related or repeated information in the photo, such as family names, title relationships, and so on. 
