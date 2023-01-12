@@ -251,8 +251,11 @@ namespace 圖檔重新命名_WindowsFormsApplication1
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
+
             if (e.KeyCode == Keys.Escape)
             {
+                //在編輯時例外
+                if (textBox2.Focused) return;
                 if (MessageBox.Show("結束應用程式？", "確定結束？", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly)
                     == DialogResult.OK)
                     this.Close();
@@ -262,6 +265,8 @@ namespace 圖檔重新命名_WindowsFormsApplication1
             switch (e.KeyCode)
             {
                 case Keys.Home:
+                    //在編輯時例外
+                    if (textBox2.Focused) return;
                     //第一張圖檔
                     if (imagesList.Count() == 0) return;
                     imageIndex = 0;
@@ -270,6 +275,8 @@ namespace 圖檔重新命名_WindowsFormsApplication1
                     textBox1.Text = pictureBox1.ImageLocation;
                     break;
                 case Keys.End:
+                    //在編輯時例外
+                    if (textBox2.Focused) return;
                     //最後一張圖檔
                     if (imagesList.Count() == 0) return;
                     imageIndex = imagesList.Count - 1;
@@ -281,6 +288,8 @@ namespace 圖檔重新命名_WindowsFormsApplication1
                     nextImageShow();
                     break;
                 case Keys.Right:
+                    //在編輯時例外
+                    if (textBox2.Focused) return;
                     nextImageShow();
                     break;
                 case Keys.PageDown:
@@ -290,6 +299,8 @@ namespace 圖檔重新命名_WindowsFormsApplication1
                     previousImageShow();
                     break;
                 case Keys.Left:
+                    //在編輯時例外
+                    if (textBox2.Focused) return;
                     previousImageShow();
                     break;
                 case Keys.PageUp:
@@ -580,11 +591,6 @@ namespace 圖檔重新命名_WindowsFormsApplication1
             }
         }
 
-
-        //重新命名預覽
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-        }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
@@ -932,23 +938,35 @@ namespace 圖檔重新命名_WindowsFormsApplication1
          * 「重新命名預覽」方塊框中 20230112*/
         private void label1_DoubleClick(object sender, EventArgs e)
         {
-            if (ModifierKeys == Keys.None)
+
+            string input = label1.Text, result = "";
+            //creedit chatGPT：
+            //bool isNum = true;
+            for (int i = 0; i < input.Length; i++)
             {
-                //creedit chatGPT：
-                string input = label1.Text, result = "";
-                bool isNum = true;
-                for (int i = 0; i < input.Length; i++)
+                if (!Char.IsDigit(input[i]) && input[i] != '.')
                 {
-                    if (!Char.IsDigit(input[i]) && input[i] != '.')
-                    {
-                        isNum = false;
-                        break;
-                    }
-                    result += input[i];
+                    //isNum = false;
+                    break;
                 }
-                if (result != "") Clipboard.SetText(result);
+                result += input[i];
+            }
+            if (result != "")
+            {
+                switch (ModifierKeys)
+                {   //若按下 Ctrl 再點二下，則會以前綴方式自動填入下方「重新命名預覽」方塊框中
+                    case Keys.Control:
+                        textBox2.Text = result += "_" + textBox2.Text;
+                        break;
+                    case Keys.None:
+                        Clipboard.SetText(result);
+                        break;
+                }
             }
         }
+
+
+
 
         private void label1_MouseDown(object sender, MouseEventArgs e)
         {
@@ -957,15 +975,27 @@ namespace 圖檔重新命名_WindowsFormsApplication1
                 case MouseButtons.Left:
                     switch (ModifierKeys)
                     {
-                        //實作： 在「方便重新命名檔案」處若是顯示為正在檢視的圖片檔名（含副檔名），則滑鼠左鍵點一下，即可將其檔名（不含副檔名）的部分複製到剪貼簿以備用。
-                        case Keys.None:
-                            if (label1.Text != "方便重新命名檔案")
-                            Clipboard.SetText(Path.GetFileNameWithoutExtension(label1.Text));
-                            break;
                         //實作： 若按下前按住 Ctrl 鍵，則可直接貼入下方的「重新命名預覽」作為原有文字之後綴，以便編輯。
                         case Keys.Control:
                             if (label1.Text != "方便重新命名檔案")
-                                textBox2.Text += Path.GetFileNameWithoutExtension(label1.Text);
+                            {
+                                if (!isDoubleClick(DateTime.Now))
+                                {
+                                    string fn = Path.GetFileNameWithoutExtension(label1.Text);
+                                    if (textBox2.Text.IndexOf(fn) == -1)
+                                        textBox2.Text += fn;
+                                }
+                                else
+                                {
+                                    //label1_DoubleClick(sender, e);
+                                    return;
+                                }
+                            }
+                            break;
+                        //實作： 在「方便重新命名檔案」處若是顯示為正在檢視的圖片檔名（含副檔名），則滑鼠左鍵點一下，即可將其檔名（不含副檔名）的部分複製到剪貼簿以備用。
+                        case Keys.None:
+                            if (label1.Text != "方便重新命名檔案")
+                                Clipboard.SetText(Path.GetFileNameWithoutExtension(label1.Text));
                             break;
                     }
                     break;
@@ -982,6 +1012,45 @@ namespace 圖檔重新命名_WindowsFormsApplication1
                 default:
                     break;
             }
+
+        }
+
+
+        //判斷是否是 DoubleClick事件,creedit chatGPT：Determine DoubleClick Event Called：
+        private DateTime lastClick = DateTime.Now;
+        bool isDoubleClick(DateTime now)
+        {
+            TimeSpan clickInterval = now - lastClick;
+            if (clickInterval.TotalMilliseconds < SystemInformation.DoubleClickTime)//使用 SystemInformation.DoubleClickTime 屬性來判斷是否為 DoubleClick 事件。
+            {
+                // it's a double click
+                return true;
+            }
+            else
+            {
+                // it's a single click
+                lastClick = DateTime.Now;
+                return false;
+            }
+        }
+
+        //textBox2=重新命名預覽
+        private void textBox2_KeyDown(object sender, KeyEventArgs e)
+        {
+            //textBox2.SelectedText = "";
+        }
+
+        wfrm.ToolTip toolTip1 = new wfrm.ToolTip();
+        private void label1_MouseMove(object sender, MouseEventArgs e)
+        {// creedit with YouChat：20230112
+            //toolTip1.SetToolTip(label1, "3q");
+            const string tooltipText = @"滑鼠左鍵點2下，可將此檔名（不含副檔名）的部分複製到剪貼簿以備用。
+                          >>  若按下前按住 Ctrl 鍵，則可直接貼入下方的「重新命名預覽」作為原有文字之後綴，以便編輯。
+                    >> 按二下，會複製原檔名前綴數字的部分到剪貼簿，
+                           >>若按下 Ctrl 再點二下，則會以前綴+底線「_」方式自動填入下方「重新命名預覽」方塊框中。
+                    （通常由數位器材攝製的，是以序號方式自動命名，是亦存有影像原始攝製之時間及群組的特性，往往有助於辨識年久不認的往事及當時攝製之場景。）";
+            if (toolTip1.GetToolTip(label1) != tooltipText)
+                toolTip1.SetToolTip(label1, tooltipText);
 
 
         }
