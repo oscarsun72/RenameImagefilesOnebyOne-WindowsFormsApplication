@@ -102,6 +102,8 @@ namespace 圖檔重新命名_WindowsFormsApplication1
                         textBox2.Text = "重新命名預覽";
                     }
                 }
+                //20230114 chatGPT大菩薩：Connection Close In Using：不用再額外手動close，因為在using block結束後會自動close。
+                //connection.Close();
             }
 
 
