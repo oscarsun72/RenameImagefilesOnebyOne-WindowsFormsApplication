@@ -87,25 +87,27 @@
             this.textBox1.Size = new System.Drawing.Size(719, 27);
             this.textBox1.TabIndex = 2;
             this.textBox1.Text = "要處理的資料夾路徑";
-            this.textBox1.Click += new System.EventHandler(this.textBox1_Click);
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             this.textBox1.DragDrop += new System.Windows.Forms.DragEventHandler(this.textBox1_DragDrop);
             this.textBox1.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
+            this.textBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.textBox1_MouseDown);
+            this.textBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.textBox1_MouseMove);
             // 
             // textBox2
             // 
             this.textBox2.AllowDrop = true;
-            this.textBox2.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.textBox2.Font = new System.Drawing.Font("Microsoft JhengHei UI", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox2.Location = new System.Drawing.Point(24, 670);
             this.textBox2.Margin = new System.Windows.Forms.Padding(2);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(719, 27);
+            this.textBox2.Size = new System.Drawing.Size(789, 34);
             this.textBox2.TabIndex = 3;
             this.textBox2.Text = "重新命名預覽";
-            this.textBox2.Click += new System.EventHandler(this.textBox2_Click);
             this.textBox2.DragDrop += new System.Windows.Forms.DragEventHandler(this.textBox2_DragDrop);
             this.textBox2.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
             this.textBox2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox2_KeyDown);
+            this.textBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.textBox2_MouseDown);
+            this.textBox2.MouseMove += new System.Windows.Forms.MouseEventHandler(this.textBox2_MouseMove);
             // 
             // checkBox1
             // 
@@ -125,12 +127,12 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("新細明體", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.label2.Location = new System.Drawing.Point(632, 14);
+            this.label2.Location = new System.Drawing.Point(536, 14);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(111, 19);
+            this.label2.Size = new System.Drawing.Size(244, 19);
             this.label2.TabIndex = 5;
-            this.label2.Text = "按Esc鍵關閉";
+            this.label2.Text = "按Esc鍵關閉。按F1鍵說明。";
             // 
             // comboBox1
             // 
@@ -218,6 +220,7 @@
             this.textBox3.Text = "要移動到的資料夾路徑";
             this.textBox3.Click += new System.EventHandler(this.textBox3_Click);
             this.textBox3.MouseDown += new System.Windows.Forms.MouseEventHandler(this.textBox3_MouseDown);
+            this.textBox3.MouseMove += new System.Windows.Forms.MouseEventHandler(this.textBox3_MouseMove);
             // 
             // textBox4
             // 
@@ -231,6 +234,7 @@
             this.textBox4.Text = "要移動到的資料夾路徑";
             this.textBox4.Click += new System.EventHandler(this.textBox4_Click);
             this.textBox4.MouseDown += new System.Windows.Forms.MouseEventHandler(this.textBox4_MouseDown);
+            this.textBox4.MouseMove += new System.Windows.Forms.MouseEventHandler(this.textBox4_MouseMove);
             // 
             // button4
             // 

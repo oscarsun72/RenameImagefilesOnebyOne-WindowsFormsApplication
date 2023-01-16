@@ -16,6 +16,8 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using io = System.IO;
 using static System.Net.Mime.MediaTypeNames;
 using System.Data.OleDb;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace 圖檔重新命名_WindowsFormsApplication1
 {
@@ -117,6 +119,7 @@ namespace 圖檔重新命名_WindowsFormsApplication1
             string oldfullName = pictureBox1.ImageLocation;
             if (!File.Exists(oldfullName)) return "";
             string newFullName = Path.Combine(Path.GetDirectoryName(oldfullName), textBox2.Text + Path.GetExtension(oldfullName));
+            if (newFullName == oldfullName) return "";
             int i = 0;
             while (File.Exists(newFullName))
             {
@@ -148,13 +151,30 @@ namespace 圖檔重新命名_WindowsFormsApplication1
             {
                 throw;
             }
+            form1_colorInfo();
             return newFullName;
         }
         Process prcssNewImgFullName;
+
+        //執行重新命名
         private void button1_Click(object sender, EventArgs e)
         {
             if (ModifierKeys == Keys.None)
-                renameFilename();
+            {
+                string f = renameFilename();
+                if (loadImageList(sourcePath))
+                {
+                    for (int i = 0; i < imagesList.Count; i++)
+                    {
+                        if (imagesList[i] == f)
+                        {
+                            imageIndex = i; break;
+                        }
+                    }
+                    pictureBox1.ImageLocation = f;
+                }
+
+            }
             else//開啟檔案總管檢視，重新命名的檔案會被選取
             {
                 //把之前開過的關閉
@@ -202,17 +222,10 @@ namespace 圖檔重新命名_WindowsFormsApplication1
 
         private void textBox1_Click(object sender, EventArgs e)
         {
-            //textBox1.Text = "";            
-            textBox1.Text = Clipboard.GetText();
+
         }
 
-        //重新命名預覽
-        private void textBox2_Click(object sender, EventArgs e)
-        {
-            if (textBox2.Text == "")
-                textBox2.Text = Clipboard.GetText();
-        }
-
+        //        
 
         private void Form1_DragEnter(object sender, DragEventArgs e)
         {//https://wijtb.nctu.me/archives/269/
@@ -254,18 +267,21 @@ namespace 圖檔重新命名_WindowsFormsApplication1
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
 
-            if (e.KeyCode == Keys.Escape)
-            {
-                //在編輯時例外
-                if (textBox2.Focused) return;
-                if (MessageBox.Show("結束應用程式？", "確定結束？", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly)
-                    == DialogResult.OK)
-                    this.Close();
-            }
-
-            //瀏覽圖檔
             switch (e.KeyCode)
             {
+                case Keys.Escape:
+                    //在編輯時例外
+                    if (textBox2.Focused) return;
+                    if (MessageBox.Show("結束應用程式？", "確定結束？", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly)
+                        == DialogResult.OK)
+                        this.Close();
+                    break;
+                case Keys.F1:
+                    Process.Start("https://github.com/oscarsun72/RenameImagefilesOnebyOne-WindowsFormsApplication#readme");
+                    break;
+
+                //瀏覽圖檔
+
                 case Keys.Home:
                     //在編輯時例外
                     if (textBox2.Focused) return;
@@ -776,7 +792,7 @@ namespace 圖檔重新命名_WindowsFormsApplication1
                 imageIndex = currentImageIndex;
                 pictureBox1.ImageLocation = imagesList[currentImageIndex];
                 textBox1.Text = pictureBox1.ImageLocation;
-
+                form1_colorInfo();
             }
         }
 
@@ -870,6 +886,15 @@ namespace 圖檔重新命名_WindowsFormsApplication1
         private void pictureBox1_LoadCompleted(object sender, AsyncCompletedEventArgs e)
         {
             label1Text_FileName();
+            textBox2Text_FileName();
+            if (textBox1.Text != pictureBox1.ImageLocation) textBox1.Text = pictureBox1.ImageLocation;
+        }
+
+        private void textBox2Text_FileName()
+        {
+            if (imagesList.Count == 0) return;
+            string f = imagesList[imageIndex];
+            textBox2.Text = Path.GetFileNameWithoutExtension(f);
         }
 
         private void label1Text_FileName()
@@ -940,19 +965,7 @@ namespace 圖檔重新命名_WindowsFormsApplication1
          * 「重新命名預覽」方塊框中 20230112*/
         private void label1_DoubleClick(object sender, EventArgs e)
         {
-
-            string input = label1.Text, result = "";
-            //creedit chatGPT：
-            //bool isNum = true;
-            for (int i = 0; i < input.Length; i++)
-            {
-                if (!Char.IsDigit(input[i]) && input[i] != '.')
-                {
-                    //isNum = false;
-                    break;
-                }
-                result += input[i];
-            }
+            string result = getPrefixNumberNewMethod(label1.Text);
             if (result != "")
             {
                 switch (ModifierKeys)
@@ -967,8 +980,23 @@ namespace 圖檔重新命名_WindowsFormsApplication1
             }
         }
 
+        private string getPrefixNumberNewMethod(string input)
+        {
+            string result = "";
+            //creedit chatGPT：
+            //bool isNum = true;
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (!Char.IsDigit(input[i]) && input[i] != '.')
+                {
+                    //isNum = false;
+                    break;
+                }
+                result += input[i];
+            }
 
-
+            return result;
+        }
 
         private void label1_MouseDown(object sender, MouseEventArgs e)
         {
@@ -1046,14 +1074,114 @@ namespace 圖檔重新命名_WindowsFormsApplication1
         private void label1_MouseMove(object sender, MouseEventArgs e)
         {// creedit with YouChat：20230112
             //toolTip1.SetToolTip(label1, "3q");
-            const string tooltipText = @"滑鼠左鍵點2下，可將此檔名（不含副檔名）的部分複製到剪貼簿以備用。
+            tooltipConstructor(sender,
+             @"滑鼠左鍵點2下，可將此檔名（不含副檔名）的部分複製到剪貼簿以備用。
                           >>  若按下前按住 Ctrl 鍵，則可直接貼入下方的「重新命名預覽」作為原有文字之後綴，以便編輯。
                     >> 按二下，會複製原檔名前綴數字的部分到剪貼簿，
                            >>若按下 Ctrl 再點二下，則會以前綴+底線「_」方式自動填入下方「重新命名預覽」方塊框中。
-                    （通常由數位器材攝製的，是以序號方式自動命名，是亦存有影像原始攝製之時間及群組的特性，往往有助於辨識年久不認的往事及當時攝製之場景。）";
-            if (toolTip1.GetToolTip(label1) != tooltipText)
-                toolTip1.SetToolTip(label1, tooltipText);
+                    （通常由數位器材攝製的，是以序號方式自動命名，是亦存有影像原始攝製之時間及群組的特性，往往有助於辨識年久不認的往事及當時攝製之場景。）");
 
+        }
+
+        private void textBox2_MouseMove(object sender, MouseEventArgs e)
+        {
+            string tooltipText =
+                @"若按下 Ctrl 再點一下，則會只留下原檔名前綴的數字+底線「_」部分以備用
+                    （通常由數位器材攝製的，是以序號方式自動命名，是亦存有影像原始攝製之時間及群組的特性，往往有助於辨識年久不認的往事及當時攝製之場景）
+                  若空白時在此點一下滑鼠，則會輸入剪貼簿裡的文字";
+            tooltipConstructor(sender, tooltipText);
+
+        }
+
+        private void tooltipConstructor(object sender, string tooltipText)
+        {
+            if (toolTip1.GetToolTip((Control)sender) != tooltipText)
+                toolTip1.SetToolTip((Control)sender, tooltipText);
+        }
+
+        //重新命名預覽
+        private void textBox2_MouseDown(object sender, MouseEventArgs e)
+        {
+            switch (ModifierKeys)
+            {
+                //按下Ctrl 再點滑鼠
+                case Keys.Control:
+                    string x = getPrefixNumberNewMethod(label1.Text);
+                    if (x != "")
+                        textBox2.Text = x + "_";
+                    break;
+                case Keys.None:
+                    //點滑鼠一下
+                    if (textBox2.Text == "")
+                        textBox2.Text = Clipboard.GetText();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void textBox3_tooltip(object sender)
+        {
+            tooltipConstructor(sender,
+                @"● 初次點擊「要移動到的資料夾路徑」，若剪貼簿裡已複製有資料夾路徑，則會直接輸入。
+                ● 當「要移動到的資料夾路徑」文字框內是有效資料夾路徑時，點擊一次，即會將現前的圖檔移至框中指定的目錄去，並重新載入圖檔清單，顯示被移動的下一個圖檔。
+                    一般可以在重新命名後想改放位置，再做此指定操作。
+                ● 若「要移動到的資料夾路徑」框中已是資料夾路徑，而不想行動，請對框按滑鼠右鍵（千萬別按左鍵，否則即成移動），
+                    然後再以按鍵輸入，或選擇跳出的快顯功能表菜單中「刪除」以清除路徑。
+                ● 總之，「要移動到的資料夾路徑」諸框中，只要是路徑，一經左鍵點擊，即會將現前圖檔移動到該路徑下。千萬注意！！
+                ● 若想要檢閱所移動的圖檔，可於按下左鍵點擊「要移動到的資料夾路徑」框前，按住 Ctrl ，則會在移動完畢後開啟一個新的檔案總管並選定此檔以供檢視。（Ctrl 就是掌握的意思，不想被動，想主控一切，就記得按住 control ！ ^_^ ）");
+
+        }
+        private void textBox3_MouseMove(object sender, MouseEventArgs e)
+        {
+            textBox3_tooltip(sender);
+        }
+
+        private void textBox4_MouseMove(object sender, MouseEventArgs e)
+        {
+            textBox3_tooltip(sender);
+        }
+
+        private void textBox1_MouseDown(object sender, MouseEventArgs e)
+        {
+            string x = "";
+            switch (ModifierKeys)
+            {
+                //若剪貼簿裡的內容是有效路徑且此框內所顯示者不同，則以滑鼠點一下，會自動貼入剪貼簿裡的路徑
+                case Keys.None:
+                    x = Clipboard.GetText();
+                    if (Directory.Exists(x) && x != textBox1.Text)
+                        textBox1.Text = Clipboard.GetText();
+                    break;
+                //若按住 Ctrl 再點一下，則會開啟此框所顯示的路徑資料夾以供檢視（若是全檔名則開啟所在資料夾）
+                case Keys.Control:
+                    x = textBox1.Text;
+                    if (File.Exists(x)) Process.Start(Path.GetDirectoryName(x));
+                    else if (Directory.Exists(x)) Process.Start(x);
+                    break;
+
+            }
+        }
+
+        void form1_colorInfo()
+        {//凡更動過後都當如此
+         //- 移動過後則表單會變色一下（閃一下）以示- 命名過後則表單會變色一下（閃一下）以示
+            Color c = BackColor;
+            BackColor = Color.Tan;
+            Refresh();
+            //Thread.Sleep(1700);//這才有效（這是管當前執行緒）
+            //Task.Delay(13950);//這無效，管的不是這裡，當是另一個執行緒
+            BackColor = c;
+            Refresh();
+        }
+
+        private void textBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+            tooltipConstructor(sender,
+                @"「要處理的資料夾路徑」文字框：作為首先讀取要操作的資料夾路徑輸入用，輸入後會擷取資料夾內所有圖檔（不含子資料夾），
+                        並會即刻顯示第一張圖檔以供檢視操作，且在此方塊框中改以顯示此當前圖檔的全檔名（目錄路徑+檔名+副檔名），可供後事複製等備用。
+                - 若剪貼簿裡的內容是有效路徑且此框內所顯示者不同，則以滑鼠點一下，會自動貼入剪貼簿裡的路徑；
+                - 若按住 Ctrl 再點一下，則會開啟此框所顯示的路徑資料夾以供檢視（若是全檔名則開啟所在資料夾）");
 
         }
     }
